@@ -1,564 +1,306 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RL Energy Management - Experimental Scenarios Hierarchy</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RL Energy Management - Scenario Tree</title>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-            color: #1e293b;
-            min-height: 100vh;
-            padding: 30px 20px;
-        }
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-        }
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
-        header {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.90));
-            border-radius: 16px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
+body{
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#334155 100%);
+min-height:100vh;
+padding:30px;
+color:#1e293b;
+}
 
-        header h1 {
-            font-size: 2.4em;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
+header{
+background:white;
+border-radius:16px;
+padding:30px;
+margin-bottom:25px;
+box-shadow:0 15px 40px rgba(0,0,0,.15);
+}
 
-        header p {
-            font-size: 1em;
-            color: #64748b;
-        }
+header h1{
+font-size:2rem;
+font-weight:800;
+}
 
-        .graph-wrapper {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            margin-bottom: 30px;
-            border: 1px solid #e2e8f0;
-        }
+.graph-wrapper{
+background:white;
+border-radius:16px;
+box-shadow:0 25px 70px rgba(0,0,0,.25);
+overflow:hidden;
+}
 
-        .graph-header {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            color: white;
-            padding: 20px 30px;
-            border-bottom: 2px solid #e2e8f0;
-        }
+.graph-header{
+background:#1e293b;
+color:white;
+padding:18px 25px;
+font-weight:700;
+}
 
-        .graph-header h2 {
-            font-size: 1.3em;
-            font-weight: 700;
-        }
+.graph-canvas{
+padding:40px;
+overflow:auto;
+}
 
-        .graph-canvas {
-            background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
-            padding: 60px;
-            min-height: 100vh;
-            position: relative;
-            overflow: auto;
-        }
+svg{
+width:100%;
+height:900px;
+}
 
-        svg {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+.tree-link{
+fill:none;
+stroke:#cbd5e1;
+stroke-width:3;
+}
 
-        .tree-link {
-            stroke: #cbd5e1;
-            stroke-width: 3;
-            fill: none;
-            opacity: 0.7;
-        }
+.tree-node circle{
+stroke:white;
+stroke-width:3;
+filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));
+cursor:pointer;
+}
 
-        .tree-node {
-            cursor: pointer;
-        }
+.tree-node text{
+fill:white;
+font-weight:700;
+text-anchor:middle;
+pointer-events:none;
+}
 
-        .tree-node circle {
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
-            stroke: white;
-            stroke-width: 3;
-        }
+.tooltip{
+position:fixed;
+background:white;
+border:3px solid #3b82f6;
+border-radius:10px;
+padding:12px 16px;
+font-size:13px;
+box-shadow:0 10px 25px rgba(0,0,0,.25);
+display:none;
+z-index:999;
+}
 
-        .tree-node:hover circle {
-            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
-            stroke-width: 4;
-        }
+.tooltip.visible{
+display:block;
+}
 
-        .tree-node.selected circle {
-            stroke-width: 6 !important;
-            stroke: #fbbf24 !important;
-            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 1)) !important;
-        }
+.tooltip-row{
+display:flex;
+gap:6px;
+margin-bottom:4px;
+}
 
-        .tree-node text {
-            font-weight: 800;
-            text-anchor: middle;
-            pointer-events: none;
-            fill: white;
-        }
+.tooltip-key{
+font-weight:700;
+color:#3b82f6;
+}
 
-        .text-root {
-            font-size: 24px;
-        }
-
-        .text-training {
-            font-size: 20px;
-        }
-
-        .text-pv {
-            font-size: 18px;
-        }
-
-        .text-battery {
-            font-size: 16px;
-        }
-
-        .text-scenario {
-            font-size: 14px;
-        }
-
-        .tooltip {
-            position: fixed;
-            background: white;
-            border: 3px solid #3b82f6;
-            border-radius: 12px;
-            padding: 16px 20px;
-            font-size: 13px;
-            pointer-events: none;
-            z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            display: none;
-            max-width: 280px;
-        }
-
-        .tooltip.visible {
-            display: block;
-        }
-
-        .tooltip-label {
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 10px;
-            font-size: 15px;
-        }
-
-        .tooltip-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 6px;
-        }
-
-        .tooltip-key {
-            font-weight: 700;
-            color: #3b82f6;
-            min-width: 70px;
-        }
-
-        .tooltip-value {
-            color: #64748b;
-        }
-
-        .legend {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 15px;
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
-            border: 1px solid #e2e8f0;
-            margin-bottom: 30px;
-        }
-
-        .legend-title {
-            grid-column: 1 / -1;
-            font-size: 1.2em;
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 10px;
-        }
-
-        .legend-item {
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-            padding: 12px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .legend-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            font-size: 18px;
-        }
-
-        .legend-content h4 {
-            font-size: 0.95em;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 4px;
-        }
-
-        .legend-content p {
-            font-size: 0.85em;
-            color: #64748b;
-            line-height: 1.4;
-        }
-
-        .info-section {
-            background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
-            border-left: 6px solid #f59e0b;
-            padding: 24px;
-            border-radius: 12px;
-            color: #92400e;
-        }
-
-        .info-section h3 {
-            font-size: 1.1em;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #b45309;
-        }
-
-        .info-section p {
-            line-height: 1.6;
-            font-size: 0.95em;
-        }
-
-        @media (max-width: 1024px) {
-            header h1 {
-                font-size: 2em;
-            }
-
-            .legend {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            header {
-                padding: 25px;
-            }
-
-            header h1 {
-                font-size: 1.6em;
-            }
-
-            .legend {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+.tooltip-label{
+font-weight:800;
+margin-bottom:6px;
+}
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>🌳 Experimental Scenarios Hierarchy</h1>
-            <p>All 36 RL agent test scenarios - Hover for details • Click to highlight</p>
-        </header>
 
-        <div class="graph-wrapper">
-            <div class="graph-header">
-                <h2>Scenario Tree Structure</h2>
-            </div>
-            <div class="graph-canvas">
-                <svg id="treeSvg"></svg>
-                <div class="tooltip" id="tooltip"></div>
-            </div>
-        </div>
+<header>
+<h1>🌳 Experimental Scenarios Hierarchy</h1>
+<p>36 RL test scenarios • Hover for details</p>
+</header>
 
-        <div class="legend">
-            <div class="legend-title">📊 Legend</div>
+<div class="graph-wrapper">
 
-            <div class="legend-item">
-                <div class="legend-circle" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">🎯</div>
-                <div class="legend-content">
-                    <h4>RL Agent (Root)</h4>
-                    <p>Central training hub</p>
-                </div>
-            </div>
+<div class="graph-header">
+Scenario Tree Structure
+</div>
 
-            <div class="legend-item">
-                <div class="legend-circle" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">📅</div>
-                <div class="legend-content">
-                    <h4>Training Season</h4>
-                    <p>Winter or Summer</p>
-                </div>
-            </div>
+<div class="graph-canvas">
+<svg id="treeSvg"></svg>
+<div class="tooltip" id="tooltip"></div>
+</div>
 
-            <div class="legend-item">
-                <div class="legend-circle" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">☀️</div>
-                <div class="legend-content">
-                    <h4>PV Panel Size</h4>
-                    <p>3, 5, or 15 kWp</p>
-                </div>
-            </div>
+</div>
 
-            <div class="legend-item">
-                <div class="legend-circle" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">🔋</div>
-                <div class="legend-content">
-                    <h4>Battery Capacity</h4>
-                    <p>5, 15, or 20 kWh</p>
-                </div>
-            </div>
+<script>
 
-            <div class="legend-item">
-                <div class="legend-circle" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">❄️</div>
-                <div class="legend-content">
-                    <h4>Winter Test</h4>
-                    <p>Dec 15 evaluation</p>
-                </div>
-            </div>
+const svg=d3.select("#treeSvg");
+const width=document.querySelector(".graph-canvas").offsetWidth;
+const height=850;
 
-            <div class="legend-item">
-                <div class="legend-circle" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">🔥</div>
-                <div class="legend-content">
-                    <h4>Summer Test</h4>
-                    <p>Aug 15 evaluation</p>
-                </div>
-            </div>
-        </div>
+svg.attr("viewBox",[0,0,width,height]);
 
-        <div class="info-section">
-            <h3>📈 Experimental Design</h3>
-            <p>
-                <strong>36 scenarios</strong> from: 2 training seasons × 3 PV sizes × 3 battery capacities × 2 test seasons.
-            </p>
-        </div>
-    </div>
+const tooltip=document.getElementById("tooltip");
 
-    <script>
-        const svg = document.getElementById('treeSvg');
-        const tooltip = document.getElementById('tooltip');
-        const container = document.querySelector('.graph-canvas');
+/* ---------- BUILD TREE DATA ---------- */
 
-        // Get canvas dimensions
-        const canvasWidth = container.offsetWidth;
-        const canvasHeight = container.offsetHeight;
+const trainingSeason=['winter','summer'];
+const pvSizes=['3','5','15'];
+const batteries=['5','15','20'];
 
-        svg.setAttribute('viewBox', `0 0 ${canvasWidth} ${canvasHeight}`);
-        svg.setAttribute('width', canvasWidth);
-        svg.setAttribute('height', canvasHeight);
+const scenarioMap={
+winter:{
+'3':{'5':['y','b1'],'15':['z','c1'],'20':['a1','d1']},
+'5':{'5':['m','p'],'15':['n','q'],'20':['o','r']},
+'15':{'5':['k1','n1'],'15':['l1','o1'],'20':['m1','p1']}
+},
+summer:{
+'3':{'5':['e1','h1'],'15':['f1','i1'],'20':['g1','j1']},
+'5':{'5':['s','v'],'15':['t','w'],'20':['u','x']},
+'15':{'5':['q1','t1'],'15':['r1','u1'],'20':['s1','v1']}
+}
+};
 
-        const root = {
-            id: 'root',
-            label: 'RL Agent',
-            type: 'root',
-            color: '#3b82f6',
-            radius: 45,
-            x: canvasWidth / 2,
-            y: canvasHeight * 0.1,
-            details: { training: 'Central Hub', season: 'N/A', pv: 'N/A', battery: 'N/A', test: 'Training' },
-            children: []
-        };
+const root={
+name:'RL Agent',
+type:'root',
+color:'#3b82f6',
+radius:40,
+details:{training:'Central Hub',pv:'-',battery:'-',test:'Training'},
+children:[]
+};
 
-        // Build complete tree
-        const trainingSeason = ['winter', 'summer'];
-        const pvSizes = ['3', '5', '15'];
-        const batteries = ['5', '15', '20'];
-        
-        const scenarioMap = {
-            'winter': {
-                '3': { '5': ['y', 'b1'], '15': ['z', 'c1'], '20': ['a1', 'd1'] },
-                '5': { '5': ['m', 'p'], '15': ['n', 'q'], '20': ['o', 'r'] },
-                '15': { '5': ['k1', 'n1'], '15': ['l1', 'o1'], '20': ['m1', 'p1'] }
-            },
-            'summer': {
-                '3': { '5': ['e1', 'h1'], '15': ['f1', 'i1'], '20': ['g1', 'j1'] },
-                '5': { '5': ['s', 'v'], '15': ['t', 'w'], '20': ['u', 'x'] },
-                '15': { '5': ['q1', 't1'], '15': ['r1', 'u1'], '20': ['s1', 'v1'] }
-            }
-        };
+trainingSeason.forEach(season=>{
 
-        trainingSeason.forEach((season) => {
-            const trainingNode = {
-                id: `train-${season}`,
-                label: season === 'winter' ? 'Winter' : 'Summer',
-                type: 'training',
-                color: '#8b5cf6',
-                radius: 35,
-                details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: '-', battery: '-', test: 'Training' },
-                children: []
-            };
+const seasonNode={
+name:season==='winter'?'Winter':'Summer',
+type:'training',
+color:'#8b5cf6',
+radius:30,
+details:{training:season,pv:'-',battery:'-',test:'Training'},
+children:[]
+};
 
-            pvSizes.forEach((pvSize) => {
-                const pvNode = {
-                    id: `pv-${season}-${pvSize}`,
-                    label: `${pvSize}kWp`,
-                    type: 'pv',
-                    color: '#0ea5e9',
-                    radius: 28,
-                    details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: `${pvSize} kWp`, battery: '-', test: 'PV Size' },
-                    children: []
-                };
+pvSizes.forEach(pv=>{
 
-                batteries.forEach((battery) => {
-                    const batteryNode = {
-                        id: `bat-${season}-${pvSize}-${battery}`,
-                        label: `${battery}kWh`,
-                        type: 'battery',
-                        color: '#10b981',
-                        radius: 22,
-                        details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: `${pvSize} kWp`, battery: `${battery} kWh`, test: 'Battery' },
-                        children: []
-                    };
+const pvNode={
+name:`${pv}kWp`,
+type:'pv',
+color:'#0ea5e9',
+radius:26,
+details:{training:season,pv:`${pv}kWp`,battery:'-',test:'PV'},
+children:[]
+};
 
-                    const [winterTest, summerTest] = scenarioMap[season][pvSize][battery];
+batteries.forEach(b=>{
 
-                    batteryNode.children.push({
-                        id: winterTest,
-                        label: winterTest,
-                        type: 'scenario',
-                        color: '#06b6d4',
-                        radius: 18,
-                        details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: `${pvSize} kWp`, battery: `${battery} kWh`, test: 'Winter Test (Dec 15)' }
-                    });
+const batNode={
+name:`${b}kWh`,
+type:'battery',
+color:'#10b981',
+radius:22,
+details:{training:season,pv:`${pv}kWp`,battery:`${b}kWh`,test:'Battery'},
+children:[]
+};
 
-                    batteryNode.children.push({
-                        id: summerTest,
-                        label: summerTest,
-                        type: 'scenario',
-                        color: '#f59e0b',
-                        radius: 18,
-                        details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: `${pvSize} kWp`, battery: `${battery} kWh`, test: 'Summer Test (Aug 15)' }
-                    });
+const [winterTest,summerTest]=scenarioMap[season][pv][b];
 
-                    pvNode.children.push(batteryNode);
-                });
+batNode.children.push({
+name:winterTest,
+type:'scenario',
+color:'#06b6d4',
+radius:18,
+details:{training:season,pv:`${pv}kWp`,battery:`${b}kWh`,test:'Winter Test'}
+});
 
-                trainingNode.children.push(pvNode);
-            });
+batNode.children.push({
+name:summerTest,
+type:'scenario',
+color:'#f59e0b',
+radius:18,
+details:{training:season,pv:`${pv}kWp`,battery:`${b}kWh`,test:'Summer Test'}
+});
 
-            root.children.push(trainingNode);
-        });
+pvNode.children.push(batNode);
 
-        // Calculate positions to fill the entire viewport
-        function layout(node, x, y, offsetX, depth) {
-            node.x = x;
-            node.y = y;
+});
 
-            if (node.children && node.children.length > 0) {
-                const childSpacing = offsetX / node.children.length;
-                const verticalGap = canvasHeight * 0.22;
+seasonNode.children.push(pvNode);
 
-                node.children.forEach((child, i) => {
-                    const childX = x - offsetX / 2 + (i + 0.5) * childSpacing;
-                    layout(child, childX, y + verticalGap, offsetX / 1.5, depth + 1);
-                });
-            }
-        }
+});
 
-        layout(root, canvasWidth / 2, canvasHeight * 0.04, canvasWidth * 0.85, 0);
+root.children.push(seasonNode);
 
-        // Draw lines
-        function drawLines(node) {
-            if (node.children) {
-                node.children.forEach(child => {
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', node.x);
-                    line.setAttribute('y1', node.y);
-                    line.setAttribute('x2', child.x);
-                    line.setAttribute('y2', child.y);
-                    line.setAttribute('class', 'tree-link');
-                    svg.appendChild(line);
-                    drawLines(child);
-                });
-            }
-        }
+});
 
-        drawLines(root);
+/* ---------- D3 TREE LAYOUT ---------- */
 
-        // Draw nodes
-        function drawNodes(node) {
-            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            g.setAttribute('class', 'tree-node');
-            g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+const hierarchy=d3.hierarchy(root);
 
-            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circle.setAttribute('r', node.radius);
-            circle.setAttribute('fill', node.color);
+const treeLayout=d3.tree()
+.size([width,height-150])
+.separation(()=>1.5);
 
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            const textClass = `text-${node.type}`;
-            text.setAttribute('class', textClass);
-            text.setAttribute('dy', '0.35em');
-            text.textContent = node.label;
+treeLayout(hierarchy);
 
-            g.appendChild(circle);
-            g.appendChild(text);
+/* ---------- DRAW LINKS ---------- */
 
-            // Hover
-            g.addEventListener('mouseover', () => {
-                tooltip.classList.add('visible');
-                let html = `<div class="tooltip-label">${node.label}</div>`;
-                html += `<div class="tooltip-row"><div class="tooltip-key">Training:</div><div class="tooltip-value">${node.details.training}</div></div>`;
-                html += `<div class="tooltip-row"><div class="tooltip-key">PV:</div><div class="tooltip-value">${node.details.pv}</div></div>`;
-                html += `<div class="tooltip-row"><div class="tooltip-key">Battery:</div><div class="tooltip-value">${node.details.battery}</div></div>`;
-                html += `<div class="tooltip-row"><div class="tooltip-key">Test:</div><div class="tooltip-value">${node.details.test}</div></div>`;
-                tooltip.innerHTML = html;
+svg.append("g")
+.selectAll("path")
+.data(hierarchy.links())
+.enter()
+.append("path")
+.attr("class","tree-link")
+.attr("d",d3.linkVertical()
+.x(d=>d.x)
+.y(d=>d.y));
 
-                const rect = svg.getBoundingClientRect();
-                tooltip.style.left = (rect.left + node.x + 40) + 'px';
-                tooltip.style.top = (rect.top + node.y - 40) + 'px';
-            });
+/* ---------- DRAW NODES ---------- */
 
-            g.addEventListener('mouseout', () => {
-                tooltip.classList.remove('visible');
-            });
+const node=svg.append("g")
+.selectAll("g")
+.data(hierarchy.descendants())
+.enter()
+.append("g")
+.attr("class","tree-node")
+.attr("transform",d=>`translate(${d.x},${d.y})`);
 
-            // Click
-            g.addEventListener('click', () => {
-                document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
-                g.classList.add('selected');
-            });
+node.append("circle")
+.attr("r",d=>d.data.radius)
+.attr("fill",d=>d.data.color);
 
-            svg.appendChild(g);
+node.append("text")
+.attr("dy",".35em")
+.text(d=>d.data.name);
 
-            if (node.children) {
-                node.children.forEach(child => drawNodes(child));
-            }
-        }
+/* ---------- TOOLTIP ---------- */
 
-        drawNodes(root);
+node.on("mouseover",(event,d)=>{
 
-        // Hide tooltip outside canvas
-        document.addEventListener('mousemove', (e) => {
-            const rect = svg.getBoundingClientRect();
-            if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
-                tooltip.classList.remove('visible');
-            }
-        });
-    </script>
+tooltip.classList.add("visible");
+
+tooltip.innerHTML=`
+<div class="tooltip-label">${d.data.name}</div>
+<div class="tooltip-row"><div class="tooltip-key">Training:</div><div>${d.data.details.training}</div></div>
+<div class="tooltip-row"><div class="tooltip-key">PV:</div><div>${d.data.details.pv}</div></div>
+<div class="tooltip-row"><div class="tooltip-key">Battery:</div><div>${d.data.details.battery}</div></div>
+<div class="tooltip-row"><div class="tooltip-key">Test:</div><div>${d.data.details.test}</div></div>
+`;
+
+tooltip.style.left=(event.pageX+15)+'px';
+tooltip.style.top=(event.pageY-20)+'px';
+
+});
+
+node.on("mouseout",()=>{
+tooltip.classList.remove("visible");
+});
+
+</script>
+
 </body>
 </html>
+```
+
