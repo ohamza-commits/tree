@@ -17,8 +17,6 @@
     --text-sec:   #6e6e73;
     --text-ter:   #a1a1a6;
     --accent:     #0071e3;
-
-    /* node palette */
     --c-root:    #0071e3;
     --c-season:  #5e5ce6;
     --c-pv:      #30b0c7;
@@ -28,290 +26,62 @@
     --c-link:    rgba(0,0,0,0.1);
   }
 
-  html, body {
-    height: 100%;
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg);
-    color: var(--text-pri);
-    -webkit-font-smoothing: antialiased;
-  }
+  html, body { height: 100%; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text-pri); -webkit-font-smoothing: antialiased; }
 
-  /* ── header ── */
   header {
     position: sticky; top: 0; z-index: 40;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     background: rgba(245,245,247,0.72);
     border-bottom: 1px solid var(--border);
-    padding: 18px 32px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
+    padding: 18px 32px; display: flex; align-items: center; gap: 20px;
   }
+  header .title-block h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+  header .title-block p  { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
 
-  header .title-block h1 {
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--text-pri);
-  }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; background: rgba(0,113,227,0.1); color: var(--accent); }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
 
-  header .title-block p {
-    font-size: 12px;
-    color: var(--text-sec);
-    margin-top: 2px;
-  }
+  .layout { display: grid; grid-template-columns: 220px 1fr; gap: 16px; padding: 20px 24px; height: calc(100vh - 69px); }
+  .sidebar { display: flex; flex-direction: column; gap: 12px; }
 
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-    background: rgba(0,113,227,0.1);
-    color: var(--accent);
-  }
+  .card { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+  .card h3 { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-ter); margin-bottom: 12px; }
 
-  .badge-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%,100% { opacity: 1; }
-    50%      { opacity: .35; }
-  }
-
-  /* ── main layout ── */
-  .layout {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 16px;
-    padding: 20px 24px;
-    height: calc(100vh - 69px);
-  }
-
-  /* ── sidebar ── */
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .card {
-    background: var(--surface);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-  }
-
-  .card h3 {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-ter);
-    margin-bottom: 12px;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-    color: var(--text-sec);
-  }
-
+  .legend-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-sec); }
   .legend-item:last-child { border-bottom: none; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
-  .dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 5px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-  }
-
+  .stat-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
   .stat-row:last-child { border-bottom: none; }
-
   .stat-row .label { color: var(--text-sec); }
+  .stat-row .value { font-weight: 600; font-size: 14px; color: var(--text-pri); }
+  .hint { font-size: 11px; color: var(--text-ter); line-height: 1.5; }
 
-  .stat-row .value {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--text-pri);
-  }
+  .canvas { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); position: relative; }
+  .canvas-label { position: absolute; top: 16px; left: 20px; font-size: 11px; font-weight: 500; color: var(--text-ter); letter-spacing: 0.04em; pointer-events: none; }
 
-  .hint {
-    font-size: 11px;
-    color: var(--text-ter);
-    line-height: 1.5;
-  }
-
-  /* ── canvas ── */
-  .canvas {
-    background: var(--surface);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-    position: relative;
-  }
-
-  .canvas-label {
-    position: absolute;
-    top: 16px; left: 20px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-ter);
-    letter-spacing: 0.04em;
-    pointer-events: none;
-  }
-
-  svg {
-    width: 100%;
-    height: 100%;
-    cursor: grab;
-  }
+  svg { width: 100%; height: 100%; cursor: grab; }
   svg:active { cursor: grabbing; }
 
-  /* ── links ── */
-  .link {
-    fill: none;
-    stroke: var(--c-link);
-    stroke-width: 1.5;
-  }
-
-  /* ── nodes ── */
-  .node-circle {
-    cursor: pointer;
-    transition: filter 0.15s ease;
-  }
+  .link { fill: none; stroke: var(--c-link); stroke-width: 1.5; }
+  .node-circle { cursor: pointer; transition: filter 0.15s ease; }
   .node-circle:hover { filter: brightness(1.12); }
+  .node-label { font-family: 'DM Sans', sans-serif; font-weight: 600; fill: #1d1d1f; text-anchor: middle; dominant-baseline: middle; pointer-events: none; letter-spacing: 0.01em; }
 
-  .node-label {
-    font-family: 'DM Sans', -apple-system, sans-serif;
-    font-size: 10px;
-    font-weight: 500;
-    fill: white;
-    text-anchor: middle;
-    dominant-baseline: middle;
-    pointer-events: none;
-    letter-spacing: 0.01em;
-  }
+  #tooltip { position: fixed; display: none; z-index: 100; pointer-events: none; animation: fadeIn 0.12s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
 
-  .node-sub {
-    font-family: 'DM Sans', -apple-system, sans-serif;
-    font-size: 8px;
-    fill: rgba(255,255,255,0.7);
-    text-anchor: middle;
-    dominant-baseline: middle;
-    pointer-events: none;
-  }
-
-  .collapse-indicator {
-    font-family: 'DM Sans', -apple-system, sans-serif;
-    font-size: 14px;
-    fill: rgba(255,255,255,0.85);
-    text-anchor: middle;
-    dominant-baseline: middle;
-    pointer-events: none;
-  }
-
-  /* ── tooltip ── */
-  #tooltip {
-    position: fixed;
-    display: none;
-    z-index: 100;
-    pointer-events: none;
-    animation: fadeIn 0.12s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .tooltip-inner {
-    background: rgba(255,255,255,0.96);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
-    min-width: 200px;
-    max-width: 240px;
-  }
-
-  .tt-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .tt-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .tt-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-pri);
-  }
-
-  .tt-type {
-    font-size: 10px;
-    color: var(--text-ter);
-    margin-top: 1px;
-  }
-
-  .tt-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 0;
-    font-size: 12px;
-  }
-
-  .tt-key { color: var(--text-sec); }
-
-  .tt-val {
-    font-weight: 500;
-    color: var(--text-pri);
-  }
-
-  .tt-tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 500;
-    margin-top: 8px;
-  }
+  .tooltip-inner { background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06); min-width: 200px; max-width: 240px; }
+  .tt-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .tt-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .tt-title { font-size: 13px; font-weight: 600; color: var(--text-pri); }
+  .tt-type  { font-size: 10px; color: var(--text-ter); margin-top: 1px; }
+  .tt-row   { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 12px; }
+  .tt-key   { color: var(--text-sec); }
+  .tt-val   { font-weight: 500; color: var(--text-pri); }
+  .tt-tag   { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 500; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -319,28 +89,22 @@
 <header>
   <div class="title-block">
     <h1>RL Experimental Scenarios</h1>
-    <p>Energy system training & test configuration tree</p>
+    <p>Energy system training &amp; test configuration tree</p>
   </div>
-  <div class="badge">
-    <div class="badge-dot"></div>
-    36 leaf scenarios
-  </div>
+  <div class="badge"><div class="badge-dot"></div>36 leaf scenarios</div>
 </header>
 
 <div class="layout">
-
   <div class="sidebar">
-
     <div class="card">
       <h3>Legend</h3>
       <div class="legend-item"><div class="dot" style="background:var(--c-root)"></div>RL Agent (Root)</div>
-      <div class="legend-item"><div class="dot" style="background:var(--c-season)"></div>Training Season</div>
+      <div class="legend-item"><div class="dot" style="background:var(--c-season)"></div>❄️/☀️ Training Season</div>
       <div class="legend-item"><div class="dot" style="background:var(--c-pv)"></div>PV Array Size</div>
       <div class="legend-item"><div class="dot" style="background:var(--c-battery)"></div>Battery Capacity</div>
-      <div class="legend-item"><div class="dot" style="background:var(--c-winter)"></div>Winter Test</div>
-      <div class="legend-item"><div class="dot" style="background:var(--c-summer)"></div>Summer Test</div>
+      <div class="legend-item"><div class="dot" style="background:var(--c-winter)"></div>❄️ Winter Test</div>
+      <div class="legend-item"><div class="dot" style="background:var(--c-summer)"></div>☀️ Summer Test</div>
     </div>
-
     <div class="card">
       <h3>Configuration</h3>
       <div class="stat-row"><span class="label">Training seasons</span><span class="value">2</span></div>
@@ -349,95 +113,49 @@
       <div class="stat-row"><span class="label">Tests / leaf</span><span class="value">2</span></div>
       <div class="stat-row"><span class="label">Total scenarios</span><span class="value">36</span></div>
     </div>
-
     <div class="card">
       <h3>Controls</h3>
-      <p class="hint">
-        <strong>Click</strong> a node to expand or collapse its branch.<br><br>
-        <strong>Scroll</strong> to zoom in &amp; out.<br><br>
-        <strong>Drag</strong> to pan the canvas.
-      </p>
+      <p class="hint"><strong>Click</strong> a node to collapse / expand.<br><br><strong>Scroll</strong> to zoom in &amp; out.<br><br><strong>Drag</strong> to pan the canvas.</p>
     </div>
-
   </div>
 
   <div class="canvas">
     <span class="canvas-label">SCENARIO TREE</span>
     <svg id="tree"></svg>
   </div>
-
 </div>
 
-<div id="tooltip">
-  <div class="tooltip-inner" id="tooltip-inner"></div>
-</div>
+<div id="tooltip"><div class="tooltip-inner" id="tooltip-inner"></div></div>
 
 <script>
-/* ── helpers ── */
 const nodeInfo = {
-  root:    { type:'Root Node', desc:'Central RL agent dispatching experiments.' },
+  root:    { type:'Root Node',       desc:'Central RL agent dispatching experiments.' },
   season:  { type:'Training Season', desc:'Season used during agent training phase.' },
-  pv:      { type:'PV Array', desc:'Photovoltaic array capacity (peak power).' },
+  pv:      { type:'PV Array',        desc:'Photovoltaic array capacity (peak power).' },
   battery: { type:'Battery Storage', desc:'Stationary battery capacity (energy).' },
-  winter:  { type:'Winter Test', desc:'Performance evaluation in winter conditions.' },
-  summer:  { type:'Summer Test', desc:'Performance evaluation in summer conditions.' },
+  winter:  { type:'Winter Test',     desc:'Performance evaluation in winter conditions.' },
+  summer:  { type:'Summer Test',     desc:'Performance evaluation in summer conditions.' },
 };
 
-const seasonMeta = {
-  winter: { duration:'90 days' },
-  summer: { duration:'90 days' },
-};
-
-const pvMeta = {
-  '3':  { area:'~15 m²', panels:6,  annual:'2 700 kWh' },
-  '5':  { area:'~25 m²', panels:10, annual:'4 500 kWh' },
-  '15': { area:'~75 m²', panels:30, annual:'13 500 kWh' },
-};
-
-const battMeta = {
-  '5':  { cycles:'>3 000', cRate:'1C',  chemistry:'LFP' },
-  '15': { cycles:'>3 000', cRate:'0.5C', chemistry:'LFP' },
-  '20': { cycles:'>2 500', cRate:'0.5C', chemistry:'NMC' },
-};
-
-/* ── data ── */
 const trainingSeason = ['winter','summer'];
-const pvSizes  = ['3','5','15'];
+const pvSizes   = ['3','5','15'];
 const batteries = ['5','15','20'];
 
 const scenarioMap = {
-  winter:{ '3':{'5':['y','b1'],'15':['z','c1'],'20':['a1','d1']},
-           '5':{'5':['m','p'],'15':['n','q'],'20':['o','r']},
-           '15':{'5':['k1','n1'],'15':['l1','o1'],'20':['m1','p1']} },
-  summer:{ '3':{'5':['e1','h1'],'15':['f1','i1'],'20':['g1','j1']},
-           '5':{'5':['s','v'],'15':['t','w'],'20':['u','x']},
-           '15':{'5':['q1','t1'],'15':['r1','u1'],'20':['s1','v1']} }
+  winter:{ '3':{'5':['y','b1'],'15':['z','c1'],'20':['a1','d1']}, '5':{'5':['m','p'],'15':['n','q'],'20':['o','r']}, '15':{'5':['k1','n1'],'15':['l1','o1'],'20':['m1','p1']} },
+  summer:{ '3':{'5':['e1','h1'],'15':['f1','i1'],'20':['g1','j1']}, '5':{'5':['s','v'],'15':['t','w'],'20':['u','x']}, '15':{'5':['q1','t1'],'15':['r1','u1'],'20':['s1','v1']} }
 };
 
 const root = { name:'RL Agent', kind:'root', color:'var(--c-root)', children:[] };
-
 trainingSeason.forEach(season => {
-  const sNode = { name:season.charAt(0).toUpperCase()+season.slice(1),
-    kind:'season', season, color:'var(--c-season)', children:[] };
-
+  const sNode = { name:season.charAt(0).toUpperCase()+season.slice(1), kind:'season', season, color:'var(--c-season)', children:[] };
   pvSizes.forEach(pv => {
     const pvNode = { name:`${pv} kWp`, kind:'pv', pv, color:'var(--c-pv)', children:[] };
-
     batteries.forEach(b => {
       const battNode = { name:`${b} kWh`, kind:'battery', battery:b, color:'var(--c-battery)', children:[] };
       const [wTest, sTest] = scenarioMap[season][pv][b];
-
-      battNode.children.push({
-        name: wTest.toUpperCase(), kind:'winter',
-        id: wTest, trainSeason: season, pv, battery: b,
-        color:'var(--c-winter)'
-      });
-      battNode.children.push({
-        name: sTest.toUpperCase(), kind:'summer',
-        id: sTest, trainSeason: season, pv, battery: b,
-        color:'var(--c-summer)'
-      });
-
+      battNode.children.push({ name:wTest.toUpperCase(), kind:'winter', id:wTest, trainSeason:season, pv, battery:b, color:'var(--c-winter)' });
+      battNode.children.push({ name:sTest.toUpperCase(), kind:'summer', id:sTest, trainSeason:season, pv, battery:b, color:'var(--c-summer)' });
       pvNode.children.push(battNode);
     });
     sNode.children.push(pvNode);
@@ -445,50 +163,47 @@ trainingSeason.forEach(season => {
   root.children.push(sNode);
 });
 
-/* ── tree layout ── */
 const svgEl = document.getElementById('tree');
-const W = 1200, H = 860;
+const svg = d3.select('#tree');
+const g = svg.append('g');
 
-const svg = d3.select('#tree').attr('viewBox',[0,0,W,H]);
-const g   = svg.append('g');
+const zoom = d3.zoom().scaleExtent([0.05, 4]).on('zoom', e => g.attr('transform', e.transform));
+svg.call(zoom);
 
-svg.call(d3.zoom().scaleExtent([0.3,2.5]).on('zoom', e => g.attr('transform', e.transform)));
-
-const treeLayout = d3.tree().size([W - 80, H - 120]).nodeSize([28,120]);
-
+const treeLayout = d3.tree().nodeSize([22, 100]);
 let rootNode = d3.hierarchy(root);
 treeLayout(rootNode);
 
-/* center tree */
-const xs = rootNode.descendants().map(d => d.x);
-const shift = (W/2) - (Math.min(...xs)+Math.max(...xs))/2;
-rootNode.descendants().forEach(d => d.x += shift);
-
 drawTree();
+autoFit();
+
+function autoFit() {
+  const W = svgEl.clientWidth  || 800;
+  const H = svgEl.clientHeight || 600;
+  const nodes = rootNode.descendants();
+  const xs = nodes.map(d => d.x), ys = nodes.map(d => d.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const pad = 36;
+  const scale = Math.min(W / (maxX - minX + pad*2), H / (maxY - minY + pad*2)) * 0.96;
+  const tx = W/2 - scale * (minX + maxX) / 2;
+  const ty = H/2 - scale * (minY + maxY) / 2;
+  svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+}
 
 function drawTree() {
   g.selectAll('*').remove();
-
   const nodes = rootNode.descendants();
   const links = rootNode.links();
+  const r = d => [32,26,24,22,20][d.depth] ?? 20;
 
-  /* links */
-  g.selectAll('.link')
-    .data(links)
-    .join('path')
+  g.selectAll('.link').data(links).join('path')
     .attr('class','link')
-    .attr('d', d3.linkVertical().x(d=>d.x).y(d=>d.y+60));
+    .attr('d', d3.linkVertical().x(d=>d.x).y(d=>d.y));
 
-  /* node groups */
-  const node = g.selectAll('.node')
-    .data(nodes)
-    .join('g')
-    .attr('transform', d => `translate(${d.x},${d.y+60})`);
+  const node = g.selectAll('.node').data(nodes).join('g')
+    .attr('transform', d => `translate(${d.x},${d.y})`);
 
-  /* radius by depth */
-  const r = d => [22,18,16,14,13][d.depth] ?? 13;
-
-  /* circle */
   node.append('circle')
     .attr('class','node-circle')
     .attr('r', r)
@@ -496,100 +211,95 @@ function drawTree() {
     .attr('stroke','white')
     .attr('stroke-width', d => d.depth===0 ? 3 : 2)
     .attr('filter','drop-shadow(0 2px 6px rgba(0,0,0,0.15))')
-    .on('click',(ev,d) => {
-      if(d.children){ d._children=d.children; d.children=null; }
+    .on('click', (ev, d) => {
+      if (d.children){ d._children=d.children; d.children=null; }
       else { d.children=d._children; d._children=null; }
       treeLayout(rootNode);
-      const xs2 = rootNode.descendants().map(n=>n.x);
-      const sh2 = (W/2)-(Math.min(...xs2)+Math.max(...xs2))/2;
-      rootNode.descendants().forEach(n=>n.x+=sh2);
       drawTree();
+      autoFit();
     });
 
-  /* main label */
-  node.append('text')
-    .attr('class','node-label')
-    .attr('y', 0)
-    .text(d => {
-      const collapsed = !d.children && d._children;
-      if(collapsed) return '···';
-      const nm = d.data.name;
-      return nm.length > 6 ? nm.slice(0,5)+'…' : nm;
-    });
+  node.each(function(d) {
+    const el = d3.select(this);
+    const collapsed = !d.children && d._children;
+    const label = collapsed ? '···' : d.data.name;
+    const radius = r(d);
+    const fs = radius < 15 ? 7.5 : radius < 18 ? 8.5 : 9;
 
-  /* hover tooltip */
+    /* season nodes: emoji + name */
+    if (d.data.kind === 'season' && !collapsed) {
+      const emoji = d.data.season === 'winter' ? '❄️' : '☀️';
+      const txt = el.append('text').attr('class','node-label').style('font-size','13px');
+      txt.append('tspan').attr('x',0).attr('dy','-7px').text(emoji);
+      txt.append('tspan').attr('x',0).attr('dy','16px').style('font-size','11px').text(label);
+      return;
+    }
+
+    /* leaf nodes: emoji + id */
+    if ((d.data.kind === 'winter' || d.data.kind === 'summer') && !collapsed) {
+      const emoji = d.data.kind === 'winter' ? '❄️' : '☀️';
+      const txt = el.append('text').attr('class','node-label').style('font-size','13px');
+      txt.append('tspan').attr('x',0).attr('dy','-7px').text(emoji);
+      txt.append('tspan').attr('x',0).attr('dy','16px').style('font-size','11px').text(label);
+      return;
+    }
+
+    const parts = label.split(' ');
+    const txt = el.append('text').attr('class','node-label').style('font-size','13px');
+
+    if (parts.length >= 2) {
+      txt.append('tspan').attr('x',0).attr('dy','-7px').text(parts[0]);
+      txt.append('tspan').attr('x',0).attr('dy','16px').text(parts.slice(1).join(' '));
+    } else {
+      txt.attr('y',0).text(label);
+    }
+  });
+
   const tooltip = document.getElementById('tooltip');
   const inner   = document.getElementById('tooltip-inner');
 
-  node
-    .on('mousemove',(ev,d) => {
-      const data = d.data;
-      let html = `<div class="tt-header">
-        <div class="tt-dot" style="background:${data.color}"></div>
-        <div>
-          <div class="tt-title">${data.name}</div>
-          <div class="tt-type">${nodeInfo[data.kind]?.type ?? data.kind}</div>
-        </div>
-      </div>`;
+  node.on('mousemove', (ev, d) => {
+    const data = d.data;
+    let html = `<div class="tt-header">
+      <div class="tt-dot" style="background:${data.color}"></div>
+      <div><div class="tt-title">${data.name}</div><div class="tt-type">${nodeInfo[data.kind]?.type ?? data.kind}</div></div>
+    </div>`;
 
-      if(data.kind==='season'){
-        const m = seasonMeta[data.season];
-        html += row('Duration', m.duration);
-      }
-      else if(data.kind==='pv'){
-        const m = pvMeta[data.pv];
-        html += row('Area', m.area)
-               +row('Panel count', m.panels)
-               +row('Annual yield', m.annual);
-      }
-      else if(data.kind==='battery'){
-        const m = battMeta[data.battery];
-        html += row('Cycle life', m.cycles)
-               +row('C-rate',    m.cRate)
-               +row('Chemistry', m.chemistry);
-      }
-      else if(data.kind==='winter'||data.kind==='summer'){
-        html += row('Scenario ID',   data.id.toUpperCase())
-               +row('Train season',  data.trainSeason)
-               +row('PV size',       data.pv+' kWp')
-               +row('Battery',       data.battery+' kWh')
-               +row('Test season',   data.kind);
-        const tagColor = data.kind==='winter'
-          ? 'rgba(0,122,255,0.1);color:#007aff'
-          : 'rgba(255,159,10,0.1);color:#ff9f0a';
-        html += `<div class="tt-tag" style="background:${tagColor}">
-          ${data.kind==='winter' ? '❄️ Winter eval' : '☀️ Summer eval'}
-        </div>`;
-      }
-      else {
-        html += `<div style="font-size:12px;color:var(--text-sec);margin-top:4px">${nodeInfo[data.kind]?.desc ?? ''}</div>`;
-      }
+    if (data.kind === 'winter' || data.kind === 'summer') {
+      html += row('Scenario ID',  data.id.toUpperCase())
+            + row('Train season', data.trainSeason)
+            + row('PV size',      data.pv + ' kWp')
+            + row('Battery',      data.battery + ' kWh')
+            + row('Test season',  data.kind);
+      const tagColor = data.kind==='winter' ? 'rgba(0,122,255,0.1);color:#007aff' : 'rgba(255,159,10,0.1);color:#ff9f0a';
+      html += `<div class="tt-tag" style="background:${tagColor}">${data.kind==='winter' ? '❄️ Winter eval' : '☀️ Summer eval'}</div>`;
+    } else {
+      html += `<div style="font-size:12px;color:var(--text-sec);margin-top:4px">${nodeInfo[data.kind]?.desc ?? ''}</div>`;
+    }
 
-      inner.innerHTML = html;
-      tooltip.style.display = 'block';
-      posTooltip(ev);
-    })
-    .on('mousemove.pos', ev => posTooltip(ev))
-    .on('mouseout', () => { tooltip.style.display='none'; });
+    inner.innerHTML = html;
+    tooltip.style.display = 'block';
+    posTooltip(ev);
+  })
+  .on('mousemove.pos', ev => posTooltip(ev))
+  .on('mouseout', () => tooltip.style.display = 'none');
 }
 
-function row(k,v){
+function row(k, v) {
   return `<div class="tt-row"><span class="tt-key">${k}</span><span class="tt-val">${v}</span></div>`;
 }
 
-function posTooltip(ev){
+function posTooltip(ev) {
   const t = document.getElementById('tooltip');
-  const tw = t.offsetWidth || 240;
-  const th = t.offsetHeight || 120;
-  let lx = ev.clientX + 14;
-  let ly = ev.clientY - 14;
-  if(lx + tw > window.innerWidth  - 10) lx = ev.clientX - tw - 14;
-  if(ly + th > window.innerHeight - 10) ly = ev.clientY - th - 14;
-  t.style.left = lx+'px';
-  t.style.top  = ly+'px';
+  const tw = t.offsetWidth||240, th = t.offsetHeight||120;
+  let lx = ev.clientX+14, ly = ev.clientY-14;
+  if (lx+tw > window.innerWidth-10)  lx = ev.clientX-tw-14;
+  if (ly+th > window.innerHeight-10) ly = ev.clientY-th-14;
+  t.style.left = lx+'px'; t.style.top = ly+'px';
 }
+
+window.addEventListener('resize', () => { drawTree(); autoFit(); });
 </script>
 </body>
 </html>
-
 
