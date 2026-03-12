@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RL Energy Management - Experimental Scenarios Hierarchy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.90));
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        header h1 {
+            font-size: 2.4em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 1em;
+            color: #64748b;
+        }
+
+        .graph-wrapper {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .graph-header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 20px 30px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .graph-header h2 {
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .graph-canvas {
+            background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+            padding: 60px;
+            min-height: 100vh;
+            position: relative;
+            overflow: auto;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .tree-link {
+            stroke: #cbd5e1;
+            stroke-width: 3;
+            fill: none;
+            opacity: 0.7;
+        }
+
+        .tree-node {
+            cursor: pointer;
+        }
+
+        .tree-node circle {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+            stroke: white;
+            stroke-width: 3;
+        }
+
+        .tree-node:hover circle {
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+            stroke-width: 4;
+        }
+
+        .tree-node.selected circle {
+            stroke-width: 6 !important;
+            stroke: #fbbf24 !important;
+            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 1)) !important;
+        }
+
+        .tree-node text {
+            font-weight: 800;
+            text-anchor: middle;
+            pointer-events: none;
+            fill: white;
+        }
+
+        .text-root {
+            font-size: 24px;
+        }
+
+        .text-training {
+            font-size: 20px;
+        }
+
+        .text-pv {
+            font-size: 18px;
+        }
+
+        .text-battery {
+            font-size: 16px;
+        }
+
+        .text-scenario {
+            font-size: 14px;
+        }
+
+        .tooltip {
+            position: fixed;
+            background: white;
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            max-width: 280px;
+        }
+
+        .tooltip.visible {
+            display: block;
+        }
+
+        .tooltip-label {
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .tooltip-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .tooltip-key {
+            font-weight: 700;
+            color: #3b82f6;
+            min-width: 70px;
+        }
+
+        .tooltip-value {
+            color: #64748b;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
+
+        .legend-title {
+            grid-column: 1 / -1;
+            font-size: 1.2em;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 12px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .legend-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 18px;
+        }
+
+        .legend-content h4 {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .legend-content p {
+            font-size: 0.85em;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .info-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+            border-left: 6px solid #f59e0b;
+            padding: 24px;
+            border-radius: 12px;
+            color: #92400e;
+        }
+
+        .info-section h3 {
+            font-size: 1.1em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #b45309;
+        }
+
+        .info-section p {
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 1024px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .legend {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 25px;
+            }
+
+            header h1 {
+                font-size: 1.6em;
+            }
+
+            .legend {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌳 Experimental Scenarios Hierarchy</h1>
+            <p>All 36 RL agent test scenarios - Hover for details • Click to highlight</p>
+        </header>
+
+        <div class="graph-wrapper">
+            <div class="graph-header">
+                <h2>Scenario Tree Structure</h2>
+            </div>
+            <div class="graph-canvas">
+                <svg id="treeSvg"></svg>
+                <div class="tooltip" id="tooltip"></div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-title">📊 Legend</div>
+
+            <div class="legend-item">
+                <div class="legend-circle" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">🎯</div>
+                <div class="legend-content">
+                    <h4>RL Agent (Root)</h4>
+                    <p>Central training hub</p>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-circle" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">📅</div>
+                <div class="legend-content">
+                    <h4>Training Season</h4>
+                    <p>Winter or Summer</p>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-circle" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">☀️</div>
+                <div class="legend-content">
+                    <h4>PV Panel Size</h4>
+                    <p>3, 5, or 15 kWp</p>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-circle" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">🔋</div>
+                <div class="legend-content">
+                    <h4>Battery Capacity</h4>
+                    <p>5, 15, or 20 kWh</p>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-circle" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">❄️</div>
+                <div class="legend-content">
+                    <h4>Winter Test</h4>
+                    <p>Dec 15 evaluation</p>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <div class="legend-circle" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">🔥</div>
+                <div class="legend-content">
+                    <h4>Summer Test</h4>
+                    <p>Aug 15 evaluation</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>📈 Experimental Design</h3>
+            <p>
+                <strong>36 scenarios</strong> from: 2 training seasons × 3 PV sizes × 3 battery capacities × 2 test seasons.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const svg = document.getElementById('treeSvg');
+        const tooltip = document.getElementById('tooltip');
+        const container = document.querySelector('.graph-canvas');
+
+        // Get canvas dimensions
+        const canvasWidth = container.offsetWidth;
+        const canvasHeight = container.offsetHeight;
+
+        svg.setAttribute('viewBox', `0 0 ${canvasWidth} ${canvasHeight}`);
+        svg.setAttribute('width', canvasWidth);
+        svg.setAttribute('height', canvasHeight);
+
+        const root = {
+            id: 'root',
+            label: 'RL Agent',
+            type: 'root',
+            color: '#3b82f6',
+            radius: 45,
+            x: canvasWidth / 2,
+            y: canvasHeight * 0.1,
+            details: { training: 'Central Hub', season: 'N/A', pv: 'N/A', battery: 'N/A', test: 'Training' },
+            children: []
+        };
+
+        // Build complete tree
+        const trainingSeason = ['winter', 'summer'];
+        const pvSizes = ['3', '5', '15'];
+        const batteries = ['5', '15', '20'];
+        
+        const scenarioMap = {
+            'winter': {
+                '3': { '5': ['y', 'b1'], '15': ['z', 'c1'], '20': ['a1', 'd1'] },
+                '5': { '5': ['m', 'p'], '15': ['n', 'q'], '20': ['o', 'r'] },
+                '15': { '5': ['k1', 'n1'], '15': ['l1', 'o1'], '20': ['m1', 'p1'] }
+            },
+            'summer': {
+                '3': { '5': ['e1', 'h1'], '15': ['f1', 'i1'], '20': ['g1', 'j1'] },
+                '5': { '5': ['s', 'v'], '15': ['t', 'w'], '20': ['u', 'x'] },
+                '15': { '5': ['q1', 't1'], '15': ['r1', 'u1'], '20': ['s1', 'v1'] }
+            }
+        };
+
+        trainingSeason.forEach((season) => {
+            const trainingNode = {
+                id: `train-${season}`,
+                label: season === 'winter' ? 'Winter' : 'Summer',
+                type: 'training',
+                color: '#8b5cf6',
+                radius: 35,
+                details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: '-', battery: '-', test: 'Training' },
+                children: []
+            };
+
+            pvSizes.forEach((pvSize) => {
+                const pvNode = {
+                    id: `pv-${season}-${pvSize}`,
+                    label: `${pvSize}kWp`,
+                    type: 'pv',
+                    color: '#0ea5e9',
+                    radius: 28,
+                    details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: `${pvSize} kWp`, battery: '-', test: 'PV Size' },
+                    children: []
+                };
+
+                batteries.forEach((battery) => {
+                    const batteryNode = {
+                        id: `bat-${season}-${pvSize}-${battery}`,
+                        label: `${battery}kWh`,
+                        type: 'battery',
+                        color: '#10b981',
+                        radius: 22,
+                        details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: `${pvSize} kWp`, battery: `${battery} kWh`, test: 'Battery' },
+                        children: []
+                    };
+
+                    const [winterTest, summerTest] = scenarioMap[season][pvSize][battery];
+
+                    batteryNode.children.push({
+                        id: winterTest,
+                        label: winterTest,
+                        type: 'scenario',
+                        color: '#06b6d4',
+                        radius: 18,
+                        details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: `${pvSize} kWp`, battery: `${battery} kWh`, test: 'Winter Test (Dec 15)' }
+                    });
+
+                    batteryNode.children.push({
+                        id: summerTest,
+                        label: summerTest,
+                        type: 'scenario',
+                        color: '#f59e0b',
+                        radius: 18,
+                        details: { training: season === 'winter' ? 'Winter (Jan/Feb)' : 'Summer (Jul/Aug)', season: season === 'winter' ? 'Jan/Feb' : 'Jul/Aug', pv: `${pvSize} kWp`, battery: `${battery} kWh`, test: 'Summer Test (Aug 15)' }
+                    });
+
+                    pvNode.children.push(batteryNode);
+                });
+
+                trainingNode.children.push(pvNode);
+            });
+
+            root.children.push(trainingNode);
+        });
+
+        // Calculate positions to fill the entire viewport
+        function layout(node, x, y, offsetX, depth) {
+            node.x = x;
+            node.y = y;
+
+            if (node.children && node.children.length > 0) {
+                const childSpacing = offsetX / node.children.length;
+                const verticalGap = canvasHeight * 0.22;
+
+                node.children.forEach((child, i) => {
+                    const childX = x - offsetX / 2 + (i + 0.5) * childSpacing;
+                    layout(child, childX, y + verticalGap, offsetX / 1.5, depth + 1);
+                });
+            }
+        }
+
+        layout(root, canvasWidth / 2, canvasHeight * 0.04, canvasWidth * 0.85, 0);
+
+        // Draw lines
+        function drawLines(node) {
+            if (node.children) {
+                node.children.forEach(child => {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', node.x);
+                    line.setAttribute('y1', node.y);
+                    line.setAttribute('x2', child.x);
+                    line.setAttribute('y2', child.y);
+                    line.setAttribute('class', 'tree-link');
+                    svg.appendChild(line);
+                    drawLines(child);
+                });
+            }
+        }
+
+        drawLines(root);
+
+        // Draw nodes
+        function drawNodes(node) {
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('class', 'tree-node');
+            g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('r', node.radius);
+            circle.setAttribute('fill', node.color);
+
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            const textClass = `text-${node.type}`;
+            text.setAttribute('class', textClass);
+            text.setAttribute('dy', '0.35em');
+            text.textContent = node.label;
+
+            g.appendChild(circle);
+            g.appendChild(text);
+
+            // Hover
+            g.addEventListener('mouseover', () => {
+                tooltip.classList.add('visible');
+                let html = `<div class="tooltip-label">${node.label}</div>`;
+                html += `<div class="tooltip-row"><div class="tooltip-key">Training:</div><div class="tooltip-value">${node.details.training}</div></div>`;
+                html += `<div class="tooltip-row"><div class="tooltip-key">PV:</div><div class="tooltip-value">${node.details.pv}</div></div>`;
+                html += `<div class="tooltip-row"><div class="tooltip-key">Battery:</div><div class="tooltip-value">${node.details.battery}</div></div>`;
+                html += `<div class="tooltip-row"><div class="tooltip-key">Test:</div><div class="tooltip-value">${node.details.test}</div></div>`;
+                tooltip.innerHTML = html;
+
+                const rect = svg.getBoundingClientRect();
+                tooltip.style.left = (rect.left + node.x + 40) + 'px';
+                tooltip.style.top = (rect.top + node.y - 40) + 'px';
+            });
+
+            g.addEventListener('mouseout', () => {
+                tooltip.classList.remove('visible');
+            });
+
+            // Click
+            g.addEventListener('click', () => {
+                document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
+                g.classList.add('selected');
+            });
+
+            svg.appendChild(g);
+
+            if (node.children) {
+                node.children.forEach(child => drawNodes(child));
+            }
+        }
+
+        drawNodes(root);
+
+        // Hide tooltip outside canvas
+        document.addEventListener('mousemove', (e) => {
+            const rect = svg.getBoundingClientRect();
+            if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+                tooltip.classList.remove('visible');
+            }
+        });
+    </script>
+</body>
+</html>
