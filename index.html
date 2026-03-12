@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
   :root {
     --bg:         #f5f5f7;
     --surface:    rgba(255,255,255,0.82);
@@ -17,7 +17,7 @@
     --text-sec:   #6e6e73;
     --text-ter:   #a1a1a6;
     --accent:     #0071e3;
- 
+
     /* node palette */
     --c-root:    #0071e3;
     --c-season:  #5e5ce6;
@@ -27,7 +27,7 @@
     --c-summer:  #ff9f0a;
     --c-link:    rgba(0,0,0,0.1);
   }
- 
+
   html, body {
     height: 100%;
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -35,7 +35,7 @@
     color: var(--text-pri);
     -webkit-font-smoothing: antialiased;
   }
- 
+
   /* ── header ── */
   header {
     position: sticky; top: 0; z-index: 40;
@@ -48,20 +48,20 @@
     align-items: center;
     gap: 20px;
   }
- 
+
   header .title-block h1 {
     font-size: 17px;
     font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--text-pri);
   }
- 
+
   header .title-block p {
     font-size: 12px;
     color: var(--text-sec);
     margin-top: 2px;
   }
- 
+
   .badge {
     display: inline-flex;
     align-items: center;
@@ -73,19 +73,19 @@
     background: rgba(0,113,227,0.1);
     color: var(--accent);
   }
- 
+
   .badge-dot {
     width: 6px; height: 6px;
     border-radius: 50%;
     background: var(--accent);
     animation: pulse 2s ease-in-out infinite;
   }
- 
+
   @keyframes pulse {
     0%,100% { opacity: 1; }
     50%      { opacity: .35; }
   }
- 
+
   /* ── main layout ── */
   .layout {
     display: grid;
@@ -94,14 +94,14 @@
     padding: 20px 24px;
     height: calc(100vh - 69px);
   }
- 
+
   /* ── sidebar ── */
   .sidebar {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
- 
+
   .card {
     background: var(--surface);
     backdrop-filter: blur(16px);
@@ -111,7 +111,7 @@
     padding: 16px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.05);
   }
- 
+
   .card h3 {
     font-size: 11px;
     font-weight: 600;
@@ -120,7 +120,7 @@
     color: var(--text-ter);
     margin-bottom: 12px;
   }
- 
+
   .legend-item {
     display: flex;
     align-items: center;
@@ -130,15 +130,15 @@
     font-size: 13px;
     color: var(--text-sec);
   }
- 
+
   .legend-item:last-child { border-bottom: none; }
- 
+
   .dot {
     width: 10px; height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
   }
- 
+
   .stat-row {
     display: flex;
     justify-content: space-between;
@@ -147,23 +147,23 @@
     border-bottom: 1px solid var(--border);
     font-size: 12px;
   }
- 
+
   .stat-row:last-child { border-bottom: none; }
- 
+
   .stat-row .label { color: var(--text-sec); }
- 
+
   .stat-row .value {
     font-weight: 600;
     font-size: 14px;
     color: var(--text-pri);
   }
- 
+
   .hint {
     font-size: 11px;
     color: var(--text-ter);
     line-height: 1.5;
   }
- 
+
   /* ── canvas ── */
   .canvas {
     background: var(--surface);
@@ -175,7 +175,7 @@
     box-shadow: 0 4px 24px rgba(0,0,0,0.06);
     position: relative;
   }
- 
+
   .canvas-label {
     position: absolute;
     top: 16px; left: 20px;
@@ -185,28 +185,28 @@
     letter-spacing: 0.04em;
     pointer-events: none;
   }
- 
+
   svg {
     width: 100%;
     height: 100%;
     cursor: grab;
   }
   svg:active { cursor: grabbing; }
- 
+
   /* ── links ── */
   .link {
     fill: none;
     stroke: var(--c-link);
     stroke-width: 1.5;
   }
- 
+
   /* ── nodes ── */
   .node-circle {
     cursor: pointer;
     transition: filter 0.15s ease;
   }
   .node-circle:hover { filter: brightness(1.12); }
- 
+
   .node-label {
     font-family: 'DM Sans', -apple-system, sans-serif;
     font-size: 10px;
@@ -217,7 +217,7 @@
     pointer-events: none;
     letter-spacing: 0.01em;
   }
- 
+
   .node-sub {
     font-family: 'DM Sans', -apple-system, sans-serif;
     font-size: 8px;
@@ -226,7 +226,7 @@
     dominant-baseline: middle;
     pointer-events: none;
   }
- 
+
   .collapse-indicator {
     font-family: 'DM Sans', -apple-system, sans-serif;
     font-size: 14px;
@@ -235,7 +235,7 @@
     dominant-baseline: middle;
     pointer-events: none;
   }
- 
+
   /* ── tooltip ── */
   #tooltip {
     position: fixed;
@@ -244,12 +244,12 @@
     pointer-events: none;
     animation: fadeIn 0.12s ease;
   }
- 
+
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
   }
- 
+
   .tooltip-inner {
     background: rgba(255,255,255,0.96);
     backdrop-filter: blur(20px);
@@ -261,7 +261,7 @@
     min-width: 200px;
     max-width: 240px;
   }
- 
+
   .tt-header {
     display: flex;
     align-items: center;
@@ -270,25 +270,25 @@
     padding-bottom: 10px;
     border-bottom: 1px solid var(--border);
   }
- 
+
   .tt-dot {
     width: 10px; height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
   }
- 
+
   .tt-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-pri);
   }
- 
+
   .tt-type {
     font-size: 10px;
     color: var(--text-ter);
     margin-top: 1px;
   }
- 
+
   .tt-row {
     display: flex;
     justify-content: space-between;
@@ -296,14 +296,14 @@
     padding: 4px 0;
     font-size: 12px;
   }
- 
+
   .tt-key { color: var(--text-sec); }
- 
+
   .tt-val {
     font-weight: 500;
     color: var(--text-pri);
   }
- 
+
   .tt-tag {
     display: inline-block;
     padding: 2px 8px;
@@ -315,7 +315,7 @@
 </style>
 </head>
 <body>
- 
+
 <header>
   <div class="title-block">
     <h1>RL Experimental Scenarios</h1>
@@ -326,11 +326,11 @@
     36 leaf scenarios
   </div>
 </header>
- 
+
 <div class="layout">
- 
+
   <div class="sidebar">
- 
+
     <div class="card">
       <h3>Legend</h3>
       <div class="legend-item"><div class="dot" style="background:var(--c-root)"></div>RL Agent (Root)</div>
@@ -340,7 +340,7 @@
       <div class="legend-item"><div class="dot" style="background:var(--c-winter)"></div>Winter Test</div>
       <div class="legend-item"><div class="dot" style="background:var(--c-summer)"></div>Summer Test</div>
     </div>
- 
+
     <div class="card">
       <h3>Configuration</h3>
       <div class="stat-row"><span class="label">Training seasons</span><span class="value">2</span></div>
@@ -349,7 +349,7 @@
       <div class="stat-row"><span class="label">Tests / leaf</span><span class="value">2</span></div>
       <div class="stat-row"><span class="label">Total scenarios</span><span class="value">36</span></div>
     </div>
- 
+
     <div class="card">
       <h3>Controls</h3>
       <p class="hint">
@@ -358,20 +358,20 @@
         <strong>Drag</strong> to pan the canvas.
       </p>
     </div>
- 
+
   </div>
- 
+
   <div class="canvas">
     <span class="canvas-label">SCENARIO TREE</span>
     <svg id="tree"></svg>
   </div>
- 
+
 </div>
- 
+
 <div id="tooltip">
   <div class="tooltip-inner" id="tooltip-inner"></div>
 </div>
- 
+
 <script>
 /* ── helpers ── */
 const nodeInfo = {
@@ -382,29 +382,29 @@ const nodeInfo = {
   winter:  { type:'Winter Test', desc:'Performance evaluation in winter conditions.' },
   summer:  { type:'Summer Test', desc:'Performance evaluation in summer conditions.' },
 };
- 
+
 const seasonMeta = {
   winter: { duration:'90 days' },
   summer: { duration:'90 days' },
 };
- 
+
 const pvMeta = {
   '3':  { area:'~15 m²', panels:6,  annual:'2 700 kWh' },
   '5':  { area:'~25 m²', panels:10, annual:'4 500 kWh' },
   '15': { area:'~75 m²', panels:30, annual:'13 500 kWh' },
 };
- 
+
 const battMeta = {
   '5':  { cycles:'>3 000', cRate:'1C',  chemistry:'LFP' },
   '15': { cycles:'>3 000', cRate:'0.5C', chemistry:'LFP' },
   '20': { cycles:'>2 500', cRate:'0.5C', chemistry:'NMC' },
 };
- 
+
 /* ── data ── */
 const trainingSeason = ['winter','summer'];
 const pvSizes  = ['3','5','15'];
 const batteries = ['5','15','20'];
- 
+
 const scenarioMap = {
   winter:{ '3':{'5':['y','b1'],'15':['z','c1'],'20':['a1','d1']},
            '5':{'5':['m','p'],'15':['n','q'],'20':['o','r']},
@@ -413,20 +413,20 @@ const scenarioMap = {
            '5':{'5':['s','v'],'15':['t','w'],'20':['u','x']},
            '15':{'5':['q1','t1'],'15':['r1','u1'],'20':['s1','v1']} }
 };
- 
+
 const root = { name:'RL Agent', kind:'root', color:'var(--c-root)', children:[] };
- 
+
 trainingSeason.forEach(season => {
   const sNode = { name:season.charAt(0).toUpperCase()+season.slice(1),
     kind:'season', season, color:'var(--c-season)', children:[] };
- 
+
   pvSizes.forEach(pv => {
     const pvNode = { name:`${pv} kWp`, kind:'pv', pv, color:'var(--c-pv)', children:[] };
- 
+
     batteries.forEach(b => {
       const battNode = { name:`${b} kWh`, kind:'battery', battery:b, color:'var(--c-battery)', children:[] };
       const [wTest, sTest] = scenarioMap[season][pv][b];
- 
+
       battNode.children.push({
         name: wTest.toUpperCase(), kind:'winter',
         id: wTest, trainSeason: season, pv, battery: b,
@@ -437,57 +437,57 @@ trainingSeason.forEach(season => {
         id: sTest, trainSeason: season, pv, battery: b,
         color:'var(--c-summer)'
       });
- 
+
       pvNode.children.push(battNode);
     });
     sNode.children.push(pvNode);
   });
   root.children.push(sNode);
 });
- 
+
 /* ── tree layout ── */
 const svgEl = document.getElementById('tree');
 const W = 1200, H = 860;
- 
+
 const svg = d3.select('#tree').attr('viewBox',[0,0,W,H]);
 const g   = svg.append('g');
- 
+
 svg.call(d3.zoom().scaleExtent([0.3,2.5]).on('zoom', e => g.attr('transform', e.transform)));
- 
+
 const treeLayout = d3.tree().size([W - 80, H - 120]).nodeSize([28,120]);
- 
+
 let rootNode = d3.hierarchy(root);
 treeLayout(rootNode);
- 
+
 /* center tree */
 const xs = rootNode.descendants().map(d => d.x);
 const shift = (W/2) - (Math.min(...xs)+Math.max(...xs))/2;
 rootNode.descendants().forEach(d => d.x += shift);
- 
+
 drawTree();
- 
+
 function drawTree() {
   g.selectAll('*').remove();
- 
+
   const nodes = rootNode.descendants();
   const links = rootNode.links();
- 
+
   /* links */
   g.selectAll('.link')
     .data(links)
     .join('path')
     .attr('class','link')
     .attr('d', d3.linkVertical().x(d=>d.x).y(d=>d.y+60));
- 
+
   /* node groups */
   const node = g.selectAll('.node')
     .data(nodes)
     .join('g')
     .attr('transform', d => `translate(${d.x},${d.y+60})`);
- 
+
   /* radius by depth */
   const r = d => [22,18,16,14,13][d.depth] ?? 13;
- 
+
   /* circle */
   node.append('circle')
     .attr('class','node-circle')
@@ -505,7 +505,7 @@ function drawTree() {
       rootNode.descendants().forEach(n=>n.x+=sh2);
       drawTree();
     });
- 
+
   /* main label */
   node.append('text')
     .attr('class','node-label')
@@ -516,11 +516,11 @@ function drawTree() {
       const nm = d.data.name;
       return nm.length > 6 ? nm.slice(0,5)+'…' : nm;
     });
- 
+
   /* hover tooltip */
   const tooltip = document.getElementById('tooltip');
   const inner   = document.getElementById('tooltip-inner');
- 
+
   node
     .on('mousemove',(ev,d) => {
       const data = d.data;
@@ -531,7 +531,7 @@ function drawTree() {
           <div class="tt-type">${nodeInfo[data.kind]?.type ?? data.kind}</div>
         </div>
       </div>`;
- 
+
       if(data.kind==='season'){
         const m = seasonMeta[data.season];
         html += row('Duration', m.duration);
@@ -564,7 +564,7 @@ function drawTree() {
       else {
         html += `<div style="font-size:12px;color:var(--text-sec);margin-top:4px">${nodeInfo[data.kind]?.desc ?? ''}</div>`;
       }
- 
+
       inner.innerHTML = html;
       tooltip.style.display = 'block';
       posTooltip(ev);
@@ -572,11 +572,11 @@ function drawTree() {
     .on('mousemove.pos', ev => posTooltip(ev))
     .on('mouseout', () => { tooltip.style.display='none'; });
 }
- 
+
 function row(k,v){
   return `<div class="tt-row"><span class="tt-key">${k}</span><span class="tt-val">${v}</span></div>`;
 }
- 
+
 function posTooltip(ev){
   const t = document.getElementById('tooltip');
   const tw = t.offsetWidth || 240;
@@ -591,4 +591,5 @@ function posTooltip(ev){
 </script>
 </body>
 </html>
+
 
