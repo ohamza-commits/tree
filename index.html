@@ -323,7 +323,7 @@
   </div>
   <div class="badge">
     <div class="badge-dot"></div>
-    54 leaf scenarios
+    36 leaf scenarios
   </div>
 </header>
  
@@ -347,7 +347,7 @@
       <div class="stat-row"><span class="label">PV sizes</span><span class="value">3, 5, 15 kWp</span></div>
       <div class="stat-row"><span class="label">Battery sizes</span><span class="value">5, 15, 20 kWh</span></div>
       <div class="stat-row"><span class="label">Tests / leaf</span><span class="value">2</span></div>
-      <div class="stat-row"><span class="label">Total scenarios</span><span class="value">54</span></div>
+      <div class="stat-row"><span class="label">Total scenarios</span><span class="value">36</span></div>
     </div>
  
     <div class="card">
@@ -384,8 +384,8 @@ const nodeInfo = {
 };
  
 const seasonMeta = {
-  winter: { avgIrr:'1.8 kWh/m²/d', temp:'-2 – 8 °C', duration:'90 days' },
-  summer: { avgIrr:'5.4 kWh/m²/d', temp:'18 – 32 °C', duration:'90 days' },
+  winter: { duration:'90 days' },
+  summer: { duration:'90 days' },
 };
  
 const pvMeta = {
@@ -534,9 +534,7 @@ function drawTree() {
  
       if(data.kind==='season'){
         const m = seasonMeta[data.season];
-        html += row('Avg irradiance', m.avgIrr)
-               +row('Temperature',   m.temp)
-               +row('Duration',       m.duration);
+        html += row('Duration', m.duration);
       }
       else if(data.kind==='pv'){
         const m = pvMeta[data.pv];
@@ -593,5 +591,4 @@ function posTooltip(ev){
 </script>
 </body>
 </html>
-
 
