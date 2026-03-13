@@ -11,7 +11,7 @@
 
   :root {
     --bg:         #f5f5f7;
-    --surface:    rgba(255,255,255,0.82);
+    --surface:    rgba(255,255,255,0.88);
     --border:     rgba(0,0,0,0.08);
     --text-pri:   #1d1d1f;
     --text-sec:   #6e6e73;
@@ -39,28 +39,61 @@
   header .title-block h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
   header .title-block p  { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
 
-  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; background: rgba(0,113,227,0.1); color: var(--accent); }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; background: rgba(0,113,227,0.1); color: var(--accent); margin-left: auto; }
   .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
 
-  .layout { display: grid; grid-template-columns: 220px 1fr; gap: 16px; padding: 20px 24px; height: calc(100vh - 69px); }
-  .sidebar { display: flex; flex-direction: column; gap: 12px; }
+  .layout { display: grid; grid-template-columns: 232px 1fr; gap: 16px; padding: 20px 24px; height: calc(100vh - 69px); }
+  .sidebar { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
 
-  .card { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
-  .card h3 { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-ter); margin-bottom: 12px; }
+  .card { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+  .card h3 { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-ter); margin-bottom: 10px; }
 
-  .legend-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-sec); }
-  .legend-item:last-child { border-bottom: none; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  /* ── Filter chips ── */
+  .filter-group { margin-bottom: 10px; }
+  .filter-group:last-child { margin-bottom: 0; }
+  .filter-label {
+    font-size: 11px; font-weight: 600; color: var(--text-sec);
+    display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+  }
+  .filter-label .swatch {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 500;
+    cursor: pointer; user-select: none; transition: all 0.15s ease;
+    border: 1.5px solid transparent;
+  }
+  .chip .chip-icon { font-size: 11px; line-height: 1; }
+
+  /* OFF state */
+  .chip { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); color: var(--text-ter); }
+  .chip:hover { background: rgba(0,0,0,0.07); color: var(--text-sec); }
+
+  /* ON states per group */
+  .chip.active.chip--season  { background: rgba(94,92,230,0.12); border-color: rgba(94,92,230,0.35); color: #5e5ce6; }
+  .chip.active.chip--pv      { background: rgba(48,176,199,0.12); border-color: rgba(48,176,199,0.35); color: #1a8ea0; }
+  .chip.active.chip--battery { background: rgba(52,199,89,0.12);  border-color: rgba(52,199,89,0.4);  color: #1a9e44; }
+  .chip.active.chip--winter  { background: rgba(0,122,255,0.12);  border-color: rgba(0,122,255,0.35); color: #007aff; }
+  .chip.active.chip--summer  { background: rgba(255,159,10,0.12); border-color: rgba(255,159,10,0.45); color: #c97900; }
+
+  .divider { height: 1px; background: var(--border); margin: 8px 0; }
 
   .stat-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
   .stat-row:last-child { border-bottom: none; }
   .stat-row .label { color: var(--text-sec); }
   .stat-row .value { font-weight: 600; font-size: 14px; color: var(--text-pri); }
+  #count-badge { transition: color 0.15s; }
+
   .hint { font-size: 11px; color: var(--text-ter); line-height: 1.5; }
 
   .canvas { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); position: relative; }
   .canvas-label { position: absolute; top: 16px; left: 20px; font-size: 11px; font-weight: 500; color: var(--text-ter); letter-spacing: 0.04em; pointer-events: none; }
+  .empty-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; color: var(--text-ter); font-size: 13px; display: none; pointer-events: none; }
+  .empty-msg strong { display: block; font-size: 22px; margin-bottom: 6px; }
 
   svg { width: 100%; height: 100%; cursor: grab; }
   svg:active { cursor: grabbing; }
@@ -72,10 +105,9 @@
 
   #tooltip { position: fixed; display: none; z-index: 100; pointer-events: none; animation: fadeIn 0.12s ease; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
-
-  .tooltip-inner { background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06); min-width: 200px; max-width: 240px; }
+  .tooltip-inner { background: rgba(255,255,255,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06); min-width: 200px; max-width: 240px; }
   .tt-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-  .tt-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .tt-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .tt-title { font-size: 13px; font-weight: 600; color: var(--text-pri); }
   .tt-type  { font-size: 10px; color: var(--text-ter); margin-top: 1px; }
   .tt-row   { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 12px; }
@@ -91,43 +123,135 @@
     <h1>RL Experimental Scenarios</h1>
     <p>Energy system training &amp; test configuration tree</p>
   </div>
-  <div class="badge"><div class="badge-dot"></div>36 leaf scenarios</div>
+  <div class="badge"><div class="badge-dot"></div><span id="leaf-count">36</span>&nbsp;leaf scenarios</div>
 </header>
 
 <div class="layout">
   <div class="sidebar">
+
+    <!-- Filters card -->
     <div class="card">
-      <h3>Legend</h3>
-      <div class="legend-item"><div class="dot" style="background:var(--c-root)"></div>RL Agent (Root)</div>
-      <div class="legend-item"><div class="dot" style="background:var(--c-season)"></div>❄️/☀️ Training Season</div>
-      <div class="legend-item"><div class="dot" style="background:var(--c-pv)"></div>PV Array Size</div>
-      <div class="legend-item"><div class="dot" style="background:var(--c-battery)"></div>Battery Capacity</div>
-      <div class="legend-item"><div class="dot" style="background:var(--c-winter)"></div>❄️ Winter Test</div>
-      <div class="legend-item"><div class="dot" style="background:var(--c-summer)"></div>☀️ Summer Test</div>
+      <h3>Filters</h3>
+
+      <div class="filter-group">
+        <div class="filter-label">
+          <span class="swatch" style="background:var(--c-season)"></span>Training season
+        </div>
+        <div class="chip-row" id="chips-trainSeason"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="filter-group">
+        <div class="filter-label">
+          <span class="swatch" style="background:var(--c-pv)"></span>PV array size
+        </div>
+        <div class="chip-row" id="chips-pv"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="filter-group">
+        <div class="filter-label">
+          <span class="swatch" style="background:var(--c-battery)"></span>BESS capacity
+        </div>
+        <div class="chip-row" id="chips-battery"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="filter-group" style="margin-bottom:0">
+        <div class="filter-label">
+          <span class="swatch" style="background:var(--c-winter)"></span>Test season
+        </div>
+        <div class="chip-row" id="chips-testSeason"></div>
+      </div>
     </div>
+
+    <!-- Stats card -->
     <div class="card">
-      <h3>Configuration</h3>
-      <div class="stat-row"><span class="label">Training seasons</span><span class="value">2</span></div>
-      <div class="stat-row"><span class="label">PV sizes</span><span class="value">3, 5, 15 kWp</span></div>
-      <div class="stat-row"><span class="label">Battery sizes</span><span class="value">5, 15, 20 kWh</span></div>
-      <div class="stat-row"><span class="label">Tests / leaf</span><span class="value">2</span></div>
-      <div class="stat-row"><span class="label">Total scenarios</span><span class="value">36</span></div>
+      <h3>Visible config</h3>
+      <div class="stat-row"><span class="label">Train seasons</span><span class="value" id="stat-seasons">2</span></div>
+      <div class="stat-row"><span class="label">PV sizes</span><span class="value" id="stat-pv">3</span></div>
+      <div class="stat-row"><span class="label">BESS sizes</span><span class="value" id="stat-battery">3</span></div>
+      <div class="stat-row"><span class="label">Test types</span><span class="value" id="stat-test">2</span></div>
+      <div class="stat-row"><span class="label">Leaf scenarios</span><span class="value" id="stat-leaves">36</span></div>
     </div>
+
+    <!-- Controls hint -->
     <div class="card">
       <h3>Controls</h3>
       <p class="hint"><strong>Click</strong> a node to collapse / expand.<br><br><strong>Scroll</strong> to zoom in &amp; out.<br><br><strong>Drag</strong> to pan the canvas.</p>
     </div>
+
   </div>
 
   <div class="canvas">
     <span class="canvas-label">SCENARIO TREE</span>
     <svg id="tree"></svg>
+    <div class="empty-msg" id="empty-msg"><strong>∅</strong>No scenarios match<br>the active filters.</div>
   </div>
 </div>
 
 <div id="tooltip"><div class="tooltip-inner" id="tooltip-inner"></div></div>
 
 <script>
+/* ── Filter state ── */
+const filters = {
+  trainSeason: new Set(['winter','summer']),
+  pv:          new Set(['3','5','15']),
+  battery:     new Set(['5','15','20']),
+  testSeason:  new Set(['winter','summer']),
+};
+
+const chipDefs = {
+  trainSeason: [
+    { value:'winter', label:'❄️ Winter', cls:'chip--season' },
+    { value:'summer', label:'☀️ Summer', cls:'chip--season' },
+  ],
+  pv: [
+    { value:'3',  label:'3 kWp',  cls:'chip--pv' },
+    { value:'5',  label:'5 kWp',  cls:'chip--pv' },
+    { value:'15', label:'15 kWp', cls:'chip--pv' },
+  ],
+  battery: [
+    { value:'5',  label:'5 kWh',  cls:'chip--battery' },
+    { value:'15', label:'15 kWh', cls:'chip--battery' },
+    { value:'20', label:'20 kWh', cls:'chip--battery' },
+  ],
+  testSeason: [
+    { value:'winter', label:'❄️ Winter', cls:'chip--winter' },
+    { value:'summer', label:'☀️ Summer', cls:'chip--summer' },
+  ],
+};
+
+function buildChips() {
+  Object.entries(chipDefs).forEach(([groupKey, defs]) => {
+    const container = document.getElementById('chips-' + groupKey);
+    defs.forEach(({ value, label, cls }) => {
+      const chip = document.createElement('button');
+      chip.className = 'chip ' + cls + ' active';
+      chip.textContent = label;
+      chip.dataset.group = groupKey;
+      chip.dataset.value = value;
+      chip.addEventListener('click', () => {
+        const set = filters[groupKey];
+        if (set.has(value)) {
+          if (set.size === 1) return; /* keep at least one */
+          set.delete(value);
+          chip.classList.remove('active');
+        } else {
+          set.add(value);
+          chip.classList.add('active');
+        }
+        rebuildAndDraw();
+      });
+      container.appendChild(chip);
+    });
+  });
+}
+
+/* ── Data ── */
 const nodeInfo = {
   root:    { type:'Root Node',       desc:'Central RL agent dispatching experiments.' },
   season:  { type:'Training Season', desc:'Season used during agent training phase.' },
@@ -137,45 +261,81 @@ const nodeInfo = {
   summer:  { type:'Summer Test',     desc:'Performance evaluation in summer conditions.' },
 };
 
-const trainingSeason = ['winter','summer'];
-const pvSizes   = ['3','5','15'];
-const batteries = ['5','15','20'];
-
 const scenarioMap = {
   winter:{ '3':{'5':['y','b1'],'15':['z','c1'],'20':['a1','d1']}, '5':{'5':['m','p'],'15':['n','q'],'20':['o','r']}, '15':{'5':['k1','n1'],'15':['l1','o1'],'20':['m1','p1']} },
   summer:{ '3':{'5':['e1','h1'],'15':['f1','i1'],'20':['g1','j1']}, '5':{'5':['s','v'],'15':['t','w'],'20':['u','x']}, '15':{'5':['q1','t1'],'15':['r1','u1'],'20':['s1','v1']} }
 };
 
-const root = { name:'RL Agent', kind:'root', color:'var(--c-root)', children:[] };
-trainingSeason.forEach(season => {
-  const sNode = { name:season.charAt(0).toUpperCase()+season.slice(1), kind:'season', season, color:'var(--c-season)', children:[] };
-  pvSizes.forEach(pv => {
-    const pvNode = { name:`${pv} kWp`, kind:'pv', pv, color:'var(--c-pv)', children:[] };
-    batteries.forEach(b => {
-      const battNode = { name:`${b} kWh`, kind:'battery', battery:b, color:'var(--c-battery)', children:[] };
-      const [wTest, sTest] = scenarioMap[season][pv][b];
-      battNode.children.push({ name:wTest.toUpperCase(), kind:'winter', id:wTest, trainSeason:season, pv, battery:b, color:'var(--c-winter)' });
-      battNode.children.push({ name:sTest.toUpperCase(), kind:'summer', id:sTest, trainSeason:season, pv, battery:b, color:'var(--c-summer)' });
-      pvNode.children.push(battNode);
-    });
-    sNode.children.push(pvNode);
-  });
-  root.children.push(sNode);
-});
+/* Build root data filtered */
+function buildData() {
+  const root = { name:'RL Agent', kind:'root', color:'var(--c-root)', children:[] };
+  let leafCount = 0;
 
+  for (const season of ['winter','summer']) {
+    if (!filters.trainSeason.has(season)) continue;
+    const sNode = { name:season.charAt(0).toUpperCase()+season.slice(1), kind:'season', season, color:'var(--c-season)', children:[] };
+
+    for (const pv of ['3','5','15']) {
+      if (!filters.pv.has(pv)) continue;
+      const pvNode = { name:`${pv} kWp`, kind:'pv', pv, color:'var(--c-pv)', children:[] };
+
+      for (const b of ['5','15','20']) {
+        if (!filters.battery.has(b)) continue;
+        const battNode = { name:`${b} kWh`, kind:'battery', battery:b, color:'var(--c-battery)', children:[] };
+        const [wTest, sTest] = scenarioMap[season][pv][b];
+
+        if (filters.testSeason.has('winter')) {
+          battNode.children.push({ name:wTest.toUpperCase(), kind:'winter', id:wTest, trainSeason:season, pv, battery:b, color:'var(--c-winter)' });
+          leafCount++;
+        }
+        if (filters.testSeason.has('summer')) {
+          battNode.children.push({ name:sTest.toUpperCase(), kind:'summer', id:sTest, trainSeason:season, pv, battery:b, color:'var(--c-summer)' });
+          leafCount++;
+        }
+
+        if (battNode.children.length) pvNode.children.push(battNode);
+      }
+      if (pvNode.children.length) sNode.children.push(pvNode);
+    }
+    if (sNode.children.length) root.children.push(sNode);
+  }
+  return { root, leafCount };
+}
+
+/* ── D3 setup ── */
 const svgEl = document.getElementById('tree');
-const svg = d3.select('#tree');
-const g = svg.append('g');
-
-const zoom = d3.zoom().scaleExtent([0.05, 4]).on('zoom', e => g.attr('transform', e.transform));
+const svg   = d3.select('#tree');
+const g     = svg.append('g');
+const zoom  = d3.zoom().scaleExtent([0.05, 4]).on('zoom', e => g.attr('transform', e.transform));
 svg.call(zoom);
 
-const treeLayout = d3.tree().nodeSize([22, 100]);
-let rootNode = d3.hierarchy(root);
-treeLayout(rootNode);
+const treeLayout = d3.tree().nodeSize([22, 110]);
+let rootNode;
 
-drawTree();
-autoFit();
+function rebuildAndDraw() {
+  const { root, leafCount } = buildData();
+
+  /* update stats */
+  document.getElementById('leaf-count').textContent = leafCount;
+  document.getElementById('stat-leaves').textContent = leafCount;
+  document.getElementById('stat-seasons').textContent = filters.trainSeason.size;
+  document.getElementById('stat-pv').textContent = filters.pv.size;
+  document.getElementById('stat-battery').textContent = filters.battery.size;
+  document.getElementById('stat-test').textContent = filters.testSeason.size;
+
+  const emptyMsg = document.getElementById('empty-msg');
+  if (!root.children.length || leafCount === 0) {
+    emptyMsg.style.display = 'block';
+    g.selectAll('*').remove();
+    return;
+  }
+  emptyMsg.style.display = 'none';
+
+  rootNode = d3.hierarchy(root);
+  treeLayout(rootNode);
+  drawTree();
+  autoFit();
+}
 
 function autoFit() {
   const W = svgEl.clientWidth  || 800;
@@ -184,7 +344,7 @@ function autoFit() {
   const xs = nodes.map(d => d.x), ys = nodes.map(d => d.y);
   const minX = Math.min(...xs), maxX = Math.max(...xs);
   const minY = Math.min(...ys), maxY = Math.max(...ys);
-  const pad = 36;
+  const pad = 40;
   const scale = Math.min(W / (maxX - minX + pad*2), H / (maxY - minY + pad*2)) * 0.96;
   const tx = W/2 - scale * (minX + maxX) / 2;
   const ty = H/2 - scale * (minY + maxY) / 2;
@@ -213,7 +373,7 @@ function drawTree() {
     .attr('filter','drop-shadow(0 2px 6px rgba(0,0,0,0.15))')
     .on('click', (ev, d) => {
       if (d.children){ d._children=d.children; d.children=null; }
-      else { d.children=d._children; d._children=null; }
+      else if (d._children) { d.children=d._children; d._children=null; }
       treeLayout(rootNode);
       drawTree();
       autoFit();
@@ -224,9 +384,7 @@ function drawTree() {
     const collapsed = !d.children && d._children;
     const label = collapsed ? '···' : d.data.name;
     const radius = r(d);
-    const fs = radius < 15 ? 7.5 : radius < 18 ? 8.5 : 9;
 
-    /* season nodes: emoji + name */
     if (d.data.kind === 'season' && !collapsed) {
       const emoji = d.data.season === 'winter' ? '❄️' : '☀️';
       const txt = el.append('text').attr('class','node-label').style('font-size','13px');
@@ -234,8 +392,6 @@ function drawTree() {
       txt.append('tspan').attr('x',0).attr('dy','16px').style('font-size','11px').text(label);
       return;
     }
-
-    /* leaf nodes: emoji + id */
     if ((d.data.kind === 'winter' || d.data.kind === 'summer') && !collapsed) {
       const emoji = d.data.kind === 'winter' ? '❄️' : '☀️';
       const txt = el.append('text').attr('class','node-label').style('font-size','13px');
@@ -246,7 +402,6 @@ function drawTree() {
 
     const parts = label.split(' ');
     const txt = el.append('text').attr('class','node-label').style('font-size','13px');
-
     if (parts.length >= 2) {
       txt.append('tspan').attr('x',0).attr('dy','-7px').text(parts[0]);
       txt.append('tspan').attr('x',0).attr('dy','16px').text(parts.slice(1).join(' '));
@@ -271,7 +426,9 @@ function drawTree() {
             + row('PV size',      data.pv + ' kWp')
             + row('Battery',      data.battery + ' kWh')
             + row('Test season',  data.kind);
-      const tagColor = data.kind==='winter' ? 'rgba(0,122,255,0.1);color:#007aff' : 'rgba(255,159,10,0.1);color:#ff9f0a';
+      const tagColor = data.kind==='winter'
+        ? 'rgba(0,122,255,0.1);color:#007aff'
+        : 'rgba(255,159,10,0.1);color:#ff9f0a';
       html += `<div class="tt-tag" style="background:${tagColor}">${data.kind==='winter' ? '❄️ Winter eval' : '☀️ Summer eval'}</div>`;
     } else {
       html += `<div style="font-size:12px;color:var(--text-sec);margin-top:4px">${nodeInfo[data.kind]?.desc ?? ''}</div>`;
@@ -288,7 +445,6 @@ function drawTree() {
 function row(k, v) {
   return `<div class="tt-row"><span class="tt-key">${k}</span><span class="tt-val">${v}</span></div>`;
 }
-
 function posTooltip(ev) {
   const t = document.getElementById('tooltip');
   const tw = t.offsetWidth||240, th = t.offsetHeight||120;
@@ -298,10 +454,14 @@ function posTooltip(ev) {
   t.style.left = lx+'px'; t.style.top = ly+'px';
 }
 
-window.addEventListener('resize', () => { drawTree(); autoFit(); });
+/* ── Init ── */
+buildChips();
+rebuildAndDraw();
+window.addEventListener('resize', () => { if(rootNode){ drawTree(); autoFit(); } });
 </script>
 </body>
 </html>
+
 
 
 
