@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RL Experimental Scenario Tree</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+<title>RL Experimental Scenario Tree · mobile ready</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -17,39 +17,80 @@
     --text-sec:   #6e6e73;
     --text-ter:   #a1a1a6;
     --accent:     #0071e3;
-    --c-root:    #0071e3;
-    --c-season:  #5e5ce6;
-    --c-pv:      #30b0c7;
-    --c-battery: #34c759;
-    --c-winter:  #007aff;
-    --c-summer:  #ff9f0a;
-    --c-link:    rgba(0,0,0,0.1);
+    --c-root:     #0071e3;
+    --c-season:   #5e5ce6;
+    --c-pv:       #30b0c7;
+    --c-battery:  #34c759;
+    --c-winter:   #007aff;
+    --c-summer:   #ff9f0a;
+    --c-link:     rgba(0,0,0,0.1);
   }
 
-  html, body { height: 100%; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text-pri); -webkit-font-smoothing: antialiased; }
+  /* flexible base */
+  html, body { 
+    height: 100%; 
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
+    background: var(--bg); 
+    color: var(--text-pri); 
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+  }
 
   header {
-    position: sticky; top: 0; z-index: 40;
+    flex-shrink: 0;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     background: rgba(245,245,247,0.72);
     border-bottom: 1px solid var(--border);
-    padding: 18px 32px; display: flex; align-items: center; gap: 20px;
+    padding: 18px 32px; 
+    display: flex; 
+    align-items: center; 
+    gap: 20px;
+    flex-wrap: wrap;
   }
   header .title-block h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
   header .title-block p  { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
 
-  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; background: rgba(0,113,227,0.1); color: var(--accent); margin-left: auto; }
+  .badge { 
+    display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; 
+    font-size: 11px; font-weight: 500; background: rgba(0,113,227,0.1); color: var(--accent); 
+    margin-left: auto; white-space: nowrap;
+  }
   .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
 
-  .layout { display: grid; grid-template-columns: 232px 1fr; gap: 16px; padding: 20px 24px; height: calc(100vh - 69px); }
-  .sidebar { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+  /* main layout – flexible, will be overridden for mobile */
+  .layout { 
+    flex: 1; 
+    display: grid; 
+    grid-template-columns: 232px 1fr; 
+    gap: 16px; 
+    padding: 20px 24px; 
+    min-height: 0;   /* essential for scrolling in grid children */
+    overflow: hidden; /* prevent layout blowout */
+  }
 
-  .card { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+  .sidebar { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .card { 
+    background: var(--surface); 
+    backdrop-filter: blur(16px); 
+    -webkit-backdrop-filter: blur(16px); 
+    border: 1px solid var(--border); 
+    border-radius: 16px; 
+    padding: 14px 16px; 
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05); 
+  }
   .card h3 { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-ter); margin-bottom: 10px; }
 
-  /* ── Filter chips ── */
+  /* filter chips – touch friendly */
   .filter-group { margin-bottom: 10px; }
   .filter-group:last-child { margin-bottom: 0; }
   .filter-label {
@@ -59,21 +100,24 @@
   .filter-label .swatch {
     width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
   }
-  .chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
 
   .chip {
     display: inline-flex; align-items: center; gap: 4px;
-    padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 500;
+    padding: 6px 12px;    /* slightly larger for fat fingers */
+    border-radius: 30px; 
+    font-size: 12px; font-weight: 500;
     cursor: pointer; user-select: none; transition: all 0.15s ease;
     border: 1.5px solid transparent;
+    background: rgba(0,0,0,0.04); 
+    border-color: rgba(0,0,0,0.08); 
+    color: var(--text-ter);
+    -webkit-tap-highlight-color: transparent;
   }
-  .chip .chip-icon { font-size: 11px; line-height: 1; }
-
-  /* OFF state */
-  .chip { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); color: var(--text-ter); }
   .chip:hover { background: rgba(0,0,0,0.07); color: var(--text-sec); }
+  .chip:active { transform: scale(0.96); } /* subtle tap feedback */
 
-  /* ON states per group */
+  /* ON states per group (same as before) */
   .chip.active.chip--season  { background: rgba(94,92,230,0.12); border-color: rgba(94,92,230,0.35); color: #5e5ce6; }
   .chip.active.chip--pv      { background: rgba(48,176,199,0.12); border-color: rgba(48,176,199,0.35); color: #1a8ea0; }
   .chip.active.chip--battery { background: rgba(52,199,89,0.12);  border-color: rgba(52,199,89,0.4);  color: #1a9e44; }
@@ -90,18 +134,46 @@
 
   .hint { font-size: 11px; color: var(--text-ter); line-height: 1.5; }
 
-  .canvas { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); position: relative; }
-  .canvas-label { position: absolute; top: 16px; left: 20px; font-size: 11px; font-weight: 500; color: var(--text-ter); letter-spacing: 0.04em; pointer-events: none; }
-  .empty-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; color: var(--text-ter); font-size: 13px; display: none; pointer-events: none; }
+  /* canvas area */
+  .canvas { 
+    background: var(--surface); 
+    backdrop-filter: blur(16px); 
+    -webkit-backdrop-filter: blur(16px); 
+    border: 1px solid var(--border); 
+    border-radius: 20px; 
+    overflow: hidden; 
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06); 
+    position: relative; 
+    min-height: 0;    /* essential for flex child */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .canvas-label { 
+    position: absolute; top: 16px; left: 20px; 
+    font-size: 11px; font-weight: 500; color: var(--text-ter); letter-spacing: 0.04em; 
+    pointer-events: none; z-index: 5;
+  }
+  .empty-msg { 
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); 
+    text-align: center; color: var(--text-ter); font-size: 13px; display: none; 
+    pointer-events: none; z-index: 5;
+  }
   .empty-msg strong { display: block; font-size: 22px; margin-bottom: 6px; }
 
-  svg { width: 100%; height: 100%; cursor: grab; }
+  svg { 
+    width: 100%; 
+    height: 100%; 
+    cursor: grab; 
+    display: block;
+    flex: 1;
+  }
   svg:active { cursor: grabbing; }
 
   .link { fill: none; stroke: var(--c-link); stroke-width: 1.5; }
   .node-circle { cursor: pointer; transition: filter 0.15s ease; }
   .node-circle:hover { filter: brightness(1.12); }
-  .node-label { font-family: 'DM Sans', sans-serif; font-weight: 600; fill: #1d1d1f; text-anchor: middle; dominant-baseline: middle; pointer-events: none; letter-spacing: 0.01em; }
+  .node-label { font-family: 'DM Sans', sans-serif; font-weight: 600; fill: #1d1d1f; text-anchor: middle; dominant-baseline: middle; pointer-events: none; letter-spacing: 0.01em; font-size: 12px; }
 
   #tooltip { position: fixed; display: none; z-index: 100; pointer-events: none; animation: fadeIn 0.12s ease; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
@@ -114,6 +186,74 @@
   .tt-key   { color: var(--text-sec); }
   .tt-val   { font-weight: 500; color: var(--text-pri); }
   .tt-tag   { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 500; margin-top: 8px; }
+
+  /* ==========  mobile responsiveness ========== */
+  @media (max-width: 640px) {
+    header {
+      padding: 12px 16px;
+      gap: 8px;
+    }
+    header .title-block h1 { font-size: 16px; }
+    header .title-block p { font-size: 11px; }
+
+    .badge { 
+      padding: 3px 8px; 
+      font-size: 10px; 
+      margin-left: 0; 
+      width: auto;
+    }
+
+    .layout {
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      gap: 12px;
+      overflow: auto;    /* allow whole page to scroll */
+      min-height: 0;
+      height: auto;
+    }
+
+    .sidebar {
+      width: 100%;
+      max-height: 44vh;  /* give more space to filters on small screen */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .canvas {
+      min-height: 50vh;
+      height: auto;
+      flex: 1 1 auto;
+      width: 100%;
+    }
+
+    /* slightly bigger tap area for chips */
+    .chip {
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+
+    .stat-row .value {
+      font-size: 13px;
+    }
+    .stat-row .label {
+      font-size: 12px;
+    }
+    .card {
+      padding: 12px;
+    }
+  }
+
+  /* for very small screens (<=400) further adjustments */
+  @media (max-width: 400px) {
+    .chip {
+      padding: 6px 10px;
+      font-size: 11px;
+    }
+    .badge {
+      font-size: 9px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -121,7 +261,7 @@
 <header>
   <div class="title-block">
     <h1>RL Experimental Scenarios</h1>
-    <p>Energy system training &amp; test configuration tree</p>
+    <p>Energy system training & test configuration tree</p>
   </div>
   <div class="badge"><div class="badge-dot"></div><span id="leaf-count">36</span>&nbsp;leaf scenarios</div>
 </header>
@@ -181,7 +321,7 @@
     <!-- Controls hint -->
     <div class="card">
       <h3>Controls</h3>
-      <p class="hint"><strong>Click</strong> a node to collapse / expand.<br><br><strong>Scroll</strong> to zoom in &amp; out.<br><br><strong>Drag</strong> to pan the canvas.</p>
+      <p class="hint"><strong>Click</strong> a node to collapse / expand.<br><br><strong>Scroll</strong> to zoom in & out.<br><br><strong>Drag</strong> to pan the canvas.</p>
     </div>
 
   </div>
@@ -228,13 +368,15 @@ const chipDefs = {
 function buildChips() {
   Object.entries(chipDefs).forEach(([groupKey, defs]) => {
     const container = document.getElementById('chips-' + groupKey);
+    container.innerHTML = ''; // clear first
     defs.forEach(({ value, label, cls }) => {
       const chip = document.createElement('button');
       chip.className = 'chip ' + cls + ' active';
       chip.textContent = label;
       chip.dataset.group = groupKey;
       chip.dataset.value = value;
-      chip.addEventListener('click', () => {
+      chip.addEventListener('click', (e) => {
+        e.preventDefault();
         const set = filters[groupKey];
         if (set.has(value)) {
           if (set.size === 1) return; /* keep at least one */
@@ -309,7 +451,7 @@ const g     = svg.append('g');
 const zoom  = d3.zoom().scaleExtent([0.05, 4]).on('zoom', e => g.attr('transform', e.transform));
 svg.call(zoom);
 
-const treeLayout = d3.tree().nodeSize([22, 110]);
+const treeLayout = d3.tree().nodeSize([22, 130]); // a bit wider for mobile readability
 let rootNode;
 
 function rebuildAndDraw() {
@@ -340,12 +482,14 @@ function rebuildAndDraw() {
 function autoFit() {
   const W = svgEl.clientWidth  || 800;
   const H = svgEl.clientHeight || 600;
+  if (!rootNode) return;
   const nodes = rootNode.descendants();
+  if (nodes.length === 0) return;
   const xs = nodes.map(d => d.x), ys = nodes.map(d => d.y);
   const minX = Math.min(...xs), maxX = Math.max(...xs);
   const minY = Math.min(...ys), maxY = Math.max(...ys);
-  const pad = 40;
-  const scale = Math.min(W / (maxX - minX + pad*2), H / (maxY - minY + pad*2)) * 0.96;
+  const pad = 50;
+  const scale = Math.min(W / (maxX - minX + pad*2), H / (maxY - minY + pad*2)) * 0.95;
   const tx = W/2 - scale * (minX + maxX) / 2;
   const ty = H/2 - scale * (minY + maxY) / 2;
   svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
@@ -387,24 +531,24 @@ function drawTree() {
 
     if (d.data.kind === 'season' && !collapsed) {
       const emoji = d.data.season === 'winter' ? '❄️' : '☀️';
-      const txt = el.append('text').attr('class','node-label').style('font-size','13px');
-      txt.append('tspan').attr('x',0).attr('dy','-7px').text(emoji);
-      txt.append('tspan').attr('x',0).attr('dy','16px').style('font-size','11px').text(label);
+      const txt = el.append('text').attr('class','node-label').style('font-size','12px');
+      txt.append('tspan').attr('x',0).attr('dy','-6px').text(emoji);
+      txt.append('tspan').attr('x',0).attr('dy','15px').style('font-size','10px').text(label);
       return;
     }
     if ((d.data.kind === 'winter' || d.data.kind === 'summer') && !collapsed) {
       const emoji = d.data.kind === 'winter' ? '❄️' : '☀️';
-      const txt = el.append('text').attr('class','node-label').style('font-size','13px');
-      txt.append('tspan').attr('x',0).attr('dy','-7px').text(emoji);
-      txt.append('tspan').attr('x',0).attr('dy','16px').style('font-size','11px').text(label);
+      const txt = el.append('text').attr('class','node-label').style('font-size','12px');
+      txt.append('tspan').attr('x',0).attr('dy','-6px').text(emoji);
+      txt.append('tspan').attr('x',0).attr('dy','15px').style('font-size','10px').text(label);
       return;
     }
 
     const parts = label.split(' ');
-    const txt = el.append('text').attr('class','node-label').style('font-size','13px');
+    const txt = el.append('text').attr('class','node-label').style('font-size','12px');
     if (parts.length >= 2) {
-      txt.append('tspan').attr('x',0).attr('dy','-7px').text(parts[0]);
-      txt.append('tspan').attr('x',0).attr('dy','16px').text(parts.slice(1).join(' '));
+      txt.append('tspan').attr('x',0).attr('dy','-6px').text(parts[0]);
+      txt.append('tspan').attr('x',0).attr('dy','15px').text(parts.slice(1).join(' '));
     } else {
       txt.attr('y',0).text(label);
     }
