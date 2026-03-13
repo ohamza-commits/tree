@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-<title>RL Experimental Scenario Tree · toggle left</title>
+<title>RL Experimental Scenario Tree · auto‑scale fix</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -70,7 +70,6 @@
     transition: grid-template-columns 0.2s ease;
   }
 
-  /* sidebar */
   .sidebar { 
     display: flex; 
     flex-direction: column; 
@@ -82,7 +81,7 @@
 
   /* when sidebar hidden */
   .layout.sidebar-hidden {
-    grid-template-columns: 0fr 1fr; /* collapse first column */
+    grid-template-columns: 0fr 1fr;
   }
   .layout.sidebar-hidden .sidebar {
     opacity: 0;
@@ -91,12 +90,11 @@
     overflow: hidden;
   }
 
-  /* toggle button – left side, always visible */
+  /* toggle button – left side */
   .toggle-sidebar {
     position: fixed;
     bottom: 24px;
-    left: 24px;        /* left instead of right */
-    right: auto;
+    left: 24px;
     width: 56px;
     height: 56px;
     border-radius: 28px;
@@ -112,12 +110,10 @@
     align-items: center;
     justify-content: center;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.1s ease, background 0.1s, width 0.2s, border-radius 0.2s;
+    transition: transform 0.1s ease, background 0.1s;
   }
   .toggle-sidebar:active { transform: scale(0.92); background: #005bbf; }
-  .toggle-sidebar:focus-visible { outline: 2px solid white; }
 
-  /* on larger screens, slightly smaller */
   @media (min-width: 1024px) {
     .toggle-sidebar {
       width: 48px;
@@ -128,7 +124,6 @@
     }
   }
 
-  /* card styles unchanged */
   .card { 
     background: var(--surface); 
     backdrop-filter: blur(16px); 
@@ -140,7 +135,6 @@
   .card h3 { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-ter); margin-bottom: 10px; }
 
   .filter-group { margin-bottom: 10px; }
-  .filter-group:last-child { margin-bottom: 0; }
   .filter-label {
     font-size: 11px; font-weight: 600; color: var(--text-sec);
     display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
@@ -218,23 +212,11 @@
   .tt-val   { font-weight: 500; color: var(--text-pri); }
   .tt-tag   { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 500; margin-top: 8px; }
 
-  /* small screen adjustments */
   @media (max-width: 640px) {
-    header {
-      padding: 12px 16px;
-    }
-    .badge { 
-      padding: 3px 8px; 
-      font-size: 10px; 
-    }
-    .layout {
-      padding: 12px;
-      gap: 12px;
-    }
-    .chip {
-      padding: 8px 12px;
-      font-size: 13px;
-    }
+    header { padding: 12px 16px; }
+    .badge { padding: 3px 8px; font-size: 10px; }
+    .layout { padding: 12px; gap: 12px; }
+    .chip { padding: 8px 12px; font-size: 13px; }
   }
 </style>
 </head>
@@ -248,12 +230,10 @@
   <div class="badge"><div class="badge-dot"></div><span id="leaf-count">36</span>&nbsp;leaf scenarios</div>
 </header>
 
-<!-- Toggle button – left side -->
 <button class="toggle-sidebar" id="toggleSidebarBtn" aria-label="Close filters">✕</button>
 
 <div class="layout" id="mainLayout">
   <div class="sidebar" id="sidebar">
-    <!-- Filters card -->
     <div class="card">
       <h3>Filters</h3>
       <div class="filter-group">
@@ -276,7 +256,6 @@
         <div class="chip-row" id="chips-testSeason"></div>
       </div>
     </div>
-    <!-- Stats card -->
     <div class="card">
       <h3>Visible config</h3>
       <div class="stat-row"><span class="label">Train seasons</span><span class="value" id="stat-seasons">2</span></div>
@@ -285,7 +264,6 @@
       <div class="stat-row"><span class="label">Test types</span><span class="value" id="stat-test">2</span></div>
       <div class="stat-row"><span class="label">Leaf scenarios</span><span class="value" id="stat-leaves">36</span></div>
     </div>
-    <!-- Controls hint -->
     <div class="card">
       <h3>Controls</h3>
       <p class="hint"><strong>Click</strong> node to collapse/expand.<br><br><strong>Scroll/pinch</strong> to zoom.<br><br><strong>Drag</strong> to pan.</p>
@@ -440,22 +418,47 @@ function rebuildAndDraw() {
   rootNode = d3.hierarchy(root);
   treeLayout(rootNode);
   drawTree();
-  autoFit();
+  // slight delay to ensure DOM layout is updated
+  setTimeout(() => autoFit(), 20);
 }
 
+/* Improved autoFit with fallback and padding adjustment */
 function autoFit() {
-  const W = svgEl.clientWidth  || 800;
-  const H = svgEl.clientHeight || 600;
   if (!rootNode) return;
   const nodes = rootNode.descendants();
   if (nodes.length === 0) return;
-  const xs = nodes.map(d => d.x), ys = nodes.map(d => d.y);
-  const minX = Math.min(...xs), maxX = Math.max(...xs);
-  const minY = Math.min(...ys), maxY = Math.max(...ys);
-  const pad = 50;
-  const scale = Math.min(W / (maxX - minX + pad*2), H / (maxY - minY + pad*2)) * 0.95;
+
+  // Get actual canvas dimensions
+  const W = svgEl.clientWidth;
+  const H = svgEl.clientHeight;
+  if (W === 0 || H === 0) {
+    // Canvas not ready, try again later
+    setTimeout(autoFit, 50);
+    return;
+  }
+
+  const xs = nodes.map(d => d.x);
+  const ys = nodes.map(d => d.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+
+  // Add padding relative to canvas size
+  const padX = W * 0.08;
+  const padY = H * 0.08;
+  const dx = maxX - minX || 1;
+  const dy = maxY - minY || 1;
+
+  const scale = Math.min(
+    (W - 2 * padX) / dx,
+    (H - 2 * padY) / dy,
+    2.5  // upper bound to avoid too much zoom
+  ) * 0.98; // tiny margin
+
   const tx = W/2 - scale * (minX + maxX) / 2;
   const ty = H/2 - scale * (minY + maxY) / 2;
+
   svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
 }
 
@@ -484,7 +487,7 @@ function drawTree() {
       else if (d._children) { d.children=d._children; d._children=null; }
       treeLayout(rootNode);
       drawTree();
-      autoFit();
+      autoFit(); // fit after collapse/expand
     });
 
   node.each(function(d) {
@@ -556,12 +559,11 @@ function posTooltip(ev) {
   t.style.left = lx+'px'; t.style.top = ly+'px';
 }
 
-/* ── Sidebar toggle with left-side icon logic ── */
+/* ── Sidebar toggle with left‑side icons ── */
 const toggleBtn = document.getElementById('toggleSidebarBtn');
 const layout = document.getElementById('mainLayout');
-let sidebarVisible = true; // start visible
+let sidebarVisible = true;
 
-// Set initial icon: visible → ✕
 toggleBtn.textContent = '✕';
 toggleBtn.setAttribute('aria-label', 'Close filters');
 
@@ -576,13 +578,23 @@ toggleBtn.addEventListener('click', () => {
     toggleBtn.textContent = '☰';
     toggleBtn.setAttribute('aria-label', 'Open filters');
   }
-  // allow DOM to update before re-fitting tree
+  // Wait for CSS transition then re‑fit
   setTimeout(() => {
     if (rootNode) autoFit();
-  }, 50);
+  }, 100);
 });
 
-window.addEventListener('resize', () => { if(rootNode){ autoFit(); } });
+/* ── Observe canvas size changes (orientation, resize) ── */
+const canvasEl = document.querySelector('.canvas');
+const resizeObserver = new ResizeObserver(() => {
+  if (rootNode) autoFit();
+});
+resizeObserver.observe(canvasEl);
+
+// Also fallback for window resize
+window.addEventListener('resize', () => {
+  if (rootNode) setTimeout(autoFit, 50);
+});
 
 /* ── Init ── */
 buildChips();
@@ -590,6 +602,4 @@ rebuildAndDraw();
 </script>
 </body>
 </html>
-
-
 
