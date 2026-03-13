@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-<title>RL Experimental Scenario Tree · mobile ready</title>
+<title>RL Experimental Scenario Tree · toggle left</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -26,13 +26,11 @@
     --c-link:     rgba(0,0,0,0.1);
   }
 
-  /* flexible base */
   html, body { 
     height: 100%; 
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
+    font-family: 'DM Sans', sans-serif; 
     background: var(--bg); 
     color: var(--text-pri); 
-    -webkit-font-smoothing: antialiased;
     display: flex;
     flex-direction: column;
   }
@@ -57,32 +55,83 @@
     font-size: 11px; font-weight: 500; background: rgba(0,113,227,0.1); color: var(--accent); 
     margin-left: auto; white-space: nowrap;
   }
-  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease-in-out infinite; }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
 
-  /* main layout – flexible, will be overridden for mobile */
+  /* main layout – grid by default */
   .layout { 
     flex: 1; 
     display: grid; 
-    grid-template-columns: 232px 1fr; 
+    grid-template-columns: 260px 1fr; 
     gap: 16px; 
     padding: 20px 24px; 
-    min-height: 0;   /* essential for scrolling in grid children */
-    overflow: hidden; /* prevent layout blowout */
+    min-height: 0;
+    overflow: hidden;
+    transition: grid-template-columns 0.2s ease;
   }
 
+  /* sidebar */
   .sidebar { 
     display: flex; 
     flex-direction: column; 
     gap: 12px; 
     overflow-y: auto; 
     -webkit-overflow-scrolling: touch;
+    transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
+  /* when sidebar hidden */
+  .layout.sidebar-hidden {
+    grid-template-columns: 0fr 1fr; /* collapse first column */
+  }
+  .layout.sidebar-hidden .sidebar {
+    opacity: 0;
+    transform: translateX(-20px);
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* toggle button – left side, always visible */
+  .toggle-sidebar {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;        /* left instead of right */
+    right: auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 16px rgba(0,113,227,0.4);
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.1s ease, background 0.1s, width 0.2s, border-radius 0.2s;
+  }
+  .toggle-sidebar:active { transform: scale(0.92); background: #005bbf; }
+  .toggle-sidebar:focus-visible { outline: 2px solid white; }
+
+  /* on larger screens, slightly smaller */
+  @media (min-width: 1024px) {
+    .toggle-sidebar {
+      width: 48px;
+      height: 48px;
+      font-size: 24px;
+      bottom: 32px;
+      left: 32px;
+    }
+  }
+
+  /* card styles unchanged */
   .card { 
     background: var(--surface); 
     backdrop-filter: blur(16px); 
-    -webkit-backdrop-filter: blur(16px); 
     border: 1px solid var(--border); 
     border-radius: 16px; 
     padding: 14px 16px; 
@@ -90,34 +139,25 @@
   }
   .card h3 { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-ter); margin-bottom: 10px; }
 
-  /* filter chips – touch friendly */
   .filter-group { margin-bottom: 10px; }
   .filter-group:last-child { margin-bottom: 0; }
   .filter-label {
     font-size: 11px; font-weight: 600; color: var(--text-sec);
     display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
   }
-  .filter-label .swatch {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  }
+  .filter-label .swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
 
   .chip {
     display: inline-flex; align-items: center; gap: 4px;
-    padding: 6px 12px;    /* slightly larger for fat fingers */
-    border-radius: 30px; 
-    font-size: 12px; font-weight: 500;
+    padding: 6px 12px; border-radius: 30px; font-size: 12px; font-weight: 500;
     cursor: pointer; user-select: none; transition: all 0.15s ease;
     border: 1.5px solid transparent;
-    background: rgba(0,0,0,0.04); 
-    border-color: rgba(0,0,0,0.08); 
-    color: var(--text-ter);
+    background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); color: var(--text-ter);
     -webkit-tap-highlight-color: transparent;
   }
-  .chip:hover { background: rgba(0,0,0,0.07); color: var(--text-sec); }
-  .chip:active { transform: scale(0.96); } /* subtle tap feedback */
+  .chip:active { transform: scale(0.96); }
 
-  /* ON states per group (same as before) */
   .chip.active.chip--season  { background: rgba(94,92,230,0.12); border-color: rgba(94,92,230,0.35); color: #5e5ce6; }
   .chip.active.chip--pv      { background: rgba(48,176,199,0.12); border-color: rgba(48,176,199,0.35); color: #1a8ea0; }
   .chip.active.chip--battery { background: rgba(52,199,89,0.12);  border-color: rgba(52,199,89,0.4);  color: #1a9e44; }
@@ -130,21 +170,18 @@
   .stat-row:last-child { border-bottom: none; }
   .stat-row .label { color: var(--text-sec); }
   .stat-row .value { font-weight: 600; font-size: 14px; color: var(--text-pri); }
-  #count-badge { transition: color 0.15s; }
 
   .hint { font-size: 11px; color: var(--text-ter); line-height: 1.5; }
 
-  /* canvas area */
   .canvas { 
     background: var(--surface); 
     backdrop-filter: blur(16px); 
-    -webkit-backdrop-filter: blur(16px); 
     border: 1px solid var(--border); 
     border-radius: 20px; 
     overflow: hidden; 
     box-shadow: 0 4px 24px rgba(0,0,0,0.06); 
     position: relative; 
-    min-height: 0;    /* essential for flex child */
+    min-height: 0;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -161,13 +198,7 @@
   }
   .empty-msg strong { display: block; font-size: 22px; margin-bottom: 6px; }
 
-  svg { 
-    width: 100%; 
-    height: 100%; 
-    cursor: grab; 
-    display: block;
-    flex: 1;
-  }
+  svg { width: 100%; height: 100%; cursor: grab; display: block; flex: 1; }
   svg:active { cursor: grabbing; }
 
   .link { fill: none; stroke: var(--c-link); stroke-width: 1.5; }
@@ -177,7 +208,7 @@
 
   #tooltip { position: fixed; display: none; z-index: 100; pointer-events: none; animation: fadeIn 0.12s ease; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
-  .tooltip-inner { background: rgba(255,255,255,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06); min-width: 200px; max-width: 240px; }
+  .tooltip-inner { background: rgba(255,255,255,0.97); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06); min-width: 200px; max-width: 240px; }
   .tt-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
   .tt-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .tt-title { font-size: 13px; font-weight: 600; color: var(--text-pri); }
@@ -187,71 +218,22 @@
   .tt-val   { font-weight: 500; color: var(--text-pri); }
   .tt-tag   { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 500; margin-top: 8px; }
 
-  /* ==========  mobile responsiveness ========== */
+  /* small screen adjustments */
   @media (max-width: 640px) {
     header {
       padding: 12px 16px;
-      gap: 8px;
     }
-    header .title-block h1 { font-size: 16px; }
-    header .title-block p { font-size: 11px; }
-
     .badge { 
       padding: 3px 8px; 
       font-size: 10px; 
-      margin-left: 0; 
-      width: auto;
     }
-
     .layout {
-      display: flex;
-      flex-direction: column;
       padding: 12px;
       gap: 12px;
-      overflow: auto;    /* allow whole page to scroll */
-      min-height: 0;
-      height: auto;
     }
-
-    .sidebar {
-      width: 100%;
-      max-height: 44vh;  /* give more space to filters on small screen */
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .canvas {
-      min-height: 50vh;
-      height: auto;
-      flex: 1 1 auto;
-      width: 100%;
-    }
-
-    /* slightly bigger tap area for chips */
     .chip {
-      padding: 8px 14px;
+      padding: 8px 12px;
       font-size: 13px;
-    }
-
-    .stat-row .value {
-      font-size: 13px;
-    }
-    .stat-row .label {
-      font-size: 12px;
-    }
-    .card {
-      padding: 12px;
-    }
-  }
-
-  /* for very small screens (<=400) further adjustments */
-  @media (max-width: 400px) {
-    .chip {
-      padding: 6px 10px;
-      font-size: 11px;
-    }
-    .badge {
-      font-size: 9px;
     }
   }
 </style>
@@ -261,53 +243,39 @@
 <header>
   <div class="title-block">
     <h1>RL Experimental Scenarios</h1>
-    <p>Energy system training & test configuration tree</p>
+    <p>Energy system training & test tree</p>
   </div>
   <div class="badge"><div class="badge-dot"></div><span id="leaf-count">36</span>&nbsp;leaf scenarios</div>
 </header>
 
-<div class="layout">
-  <div class="sidebar">
+<!-- Toggle button – left side -->
+<button class="toggle-sidebar" id="toggleSidebarBtn" aria-label="Close filters">✕</button>
 
+<div class="layout" id="mainLayout">
+  <div class="sidebar" id="sidebar">
     <!-- Filters card -->
     <div class="card">
       <h3>Filters</h3>
-
       <div class="filter-group">
-        <div class="filter-label">
-          <span class="swatch" style="background:var(--c-season)"></span>Training season
-        </div>
+        <div class="filter-label"><span class="swatch" style="background:var(--c-season)"></span>Training season</div>
         <div class="chip-row" id="chips-trainSeason"></div>
       </div>
-
       <div class="divider"></div>
-
       <div class="filter-group">
-        <div class="filter-label">
-          <span class="swatch" style="background:var(--c-pv)"></span>PV array size
-        </div>
+        <div class="filter-label"><span class="swatch" style="background:var(--c-pv)"></span>PV array size</div>
         <div class="chip-row" id="chips-pv"></div>
       </div>
-
       <div class="divider"></div>
-
       <div class="filter-group">
-        <div class="filter-label">
-          <span class="swatch" style="background:var(--c-battery)"></span>BESS capacity
-        </div>
+        <div class="filter-label"><span class="swatch" style="background:var(--c-battery)"></span>BESS capacity</div>
         <div class="chip-row" id="chips-battery"></div>
       </div>
-
       <div class="divider"></div>
-
       <div class="filter-group" style="margin-bottom:0">
-        <div class="filter-label">
-          <span class="swatch" style="background:var(--c-winter)"></span>Test season
-        </div>
+        <div class="filter-label"><span class="swatch" style="background:var(--c-winter)"></span>Test season</div>
         <div class="chip-row" id="chips-testSeason"></div>
       </div>
     </div>
-
     <!-- Stats card -->
     <div class="card">
       <h3>Visible config</h3>
@@ -317,13 +285,11 @@
       <div class="stat-row"><span class="label">Test types</span><span class="value" id="stat-test">2</span></div>
       <div class="stat-row"><span class="label">Leaf scenarios</span><span class="value" id="stat-leaves">36</span></div>
     </div>
-
     <!-- Controls hint -->
     <div class="card">
       <h3>Controls</h3>
-      <p class="hint"><strong>Click</strong> a node to collapse / expand.<br><br><strong>Scroll</strong> to zoom in & out.<br><br><strong>Drag</strong> to pan the canvas.</p>
+      <p class="hint"><strong>Click</strong> node to collapse/expand.<br><br><strong>Scroll/pinch</strong> to zoom.<br><br><strong>Drag</strong> to pan.</p>
     </div>
-
   </div>
 
   <div class="canvas">
@@ -368,7 +334,7 @@ const chipDefs = {
 function buildChips() {
   Object.entries(chipDefs).forEach(([groupKey, defs]) => {
     const container = document.getElementById('chips-' + groupKey);
-    container.innerHTML = ''; // clear first
+    container.innerHTML = '';
     defs.forEach(({ value, label, cls }) => {
       const chip = document.createElement('button');
       chip.className = 'chip ' + cls + ' active';
@@ -379,7 +345,7 @@ function buildChips() {
         e.preventDefault();
         const set = filters[groupKey];
         if (set.has(value)) {
-          if (set.size === 1) return; /* keep at least one */
+          if (set.size === 1) return;
           set.delete(value);
           chip.classList.remove('active');
         } else {
@@ -408,7 +374,6 @@ const scenarioMap = {
   summer:{ '3':{'5':['e1','h1'],'15':['f1','i1'],'20':['g1','j1']}, '5':{'5':['s','v'],'15':['t','w'],'20':['u','x']}, '15':{'5':['q1','t1'],'15':['r1','u1'],'20':['s1','v1']} }
 };
 
-/* Build root data filtered */
 function buildData() {
   const root = { name:'RL Agent', kind:'root', color:'var(--c-root)', children:[] };
   let leafCount = 0;
@@ -451,13 +416,12 @@ const g     = svg.append('g');
 const zoom  = d3.zoom().scaleExtent([0.05, 4]).on('zoom', e => g.attr('transform', e.transform));
 svg.call(zoom);
 
-const treeLayout = d3.tree().nodeSize([22, 130]); // a bit wider for mobile readability
+const treeLayout = d3.tree().nodeSize([22, 130]);
 let rootNode;
 
 function rebuildAndDraw() {
   const { root, leafCount } = buildData();
 
-  /* update stats */
   document.getElementById('leaf-count').textContent = leafCount;
   document.getElementById('stat-leaves').textContent = leafCount;
   document.getElementById('stat-seasons').textContent = filters.trainSeason.size;
@@ -527,7 +491,6 @@ function drawTree() {
     const el = d3.select(this);
     const collapsed = !d.children && d._children;
     const label = collapsed ? '···' : d.data.name;
-    const radius = r(d);
 
     if (d.data.kind === 'season' && !collapsed) {
       const emoji = d.data.season === 'winter' ? '❄️' : '☀️';
@@ -559,10 +522,7 @@ function drawTree() {
 
   node.on('mousemove', (ev, d) => {
     const data = d.data;
-    let html = `<div class="tt-header">
-      <div class="tt-dot" style="background:${data.color}"></div>
-      <div><div class="tt-title">${data.name}</div><div class="tt-type">${nodeInfo[data.kind]?.type ?? data.kind}</div></div>
-    </div>`;
+    let html = `<div class="tt-header"><div class="tt-dot" style="background:${data.color}"></div><div><div class="tt-title">${data.name}</div><div class="tt-type">${nodeInfo[data.kind]?.type ?? data.kind}</div></div></div>`;
 
     if (data.kind === 'winter' || data.kind === 'summer') {
       html += row('Scenario ID',  data.id.toUpperCase())
@@ -570,9 +530,7 @@ function drawTree() {
             + row('PV size',      data.pv + ' kWp')
             + row('Battery',      data.battery + ' kWh')
             + row('Test season',  data.kind);
-      const tagColor = data.kind==='winter'
-        ? 'rgba(0,122,255,0.1);color:#007aff'
-        : 'rgba(255,159,10,0.1);color:#ff9f0a';
+      const tagColor = data.kind==='winter' ? 'rgba(0,122,255,0.1);color:#007aff' : 'rgba(255,159,10,0.1);color:#ff9f0a';
       html += `<div class="tt-tag" style="background:${tagColor}">${data.kind==='winter' ? '❄️ Winter eval' : '☀️ Summer eval'}</div>`;
     } else {
       html += `<div style="font-size:12px;color:var(--text-sec);margin-top:4px">${nodeInfo[data.kind]?.desc ?? ''}</div>`;
@@ -598,14 +556,40 @@ function posTooltip(ev) {
   t.style.left = lx+'px'; t.style.top = ly+'px';
 }
 
+/* ── Sidebar toggle with left-side icon logic ── */
+const toggleBtn = document.getElementById('toggleSidebarBtn');
+const layout = document.getElementById('mainLayout');
+let sidebarVisible = true; // start visible
+
+// Set initial icon: visible → ✕
+toggleBtn.textContent = '✕';
+toggleBtn.setAttribute('aria-label', 'Close filters');
+
+toggleBtn.addEventListener('click', () => {
+  sidebarVisible = !sidebarVisible;
+  if (sidebarVisible) {
+    layout.classList.remove('sidebar-hidden');
+    toggleBtn.textContent = '✕';
+    toggleBtn.setAttribute('aria-label', 'Close filters');
+  } else {
+    layout.classList.add('sidebar-hidden');
+    toggleBtn.textContent = '☰';
+    toggleBtn.setAttribute('aria-label', 'Open filters');
+  }
+  // allow DOM to update before re-fitting tree
+  setTimeout(() => {
+    if (rootNode) autoFit();
+  }, 50);
+});
+
+window.addEventListener('resize', () => { if(rootNode){ autoFit(); } });
+
 /* ── Init ── */
 buildChips();
 rebuildAndDraw();
-window.addEventListener('resize', () => { if(rootNode){ drawTree(); autoFit(); } });
 </script>
 </body>
 </html>
-
 
 
 
